@@ -6,6 +6,11 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		36A0BE5F1BC41D15002AEF13 /* HvcGtk.c in Sources */ = {isa = PBXBuildFile; fileRef = 36A0BE5C1BC41D15002AEF13 /* HvcGtk.c */; settings = {ASSET_TAGS = (); }; };
+		36A0BE601BC41D15002AEF13 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 36A0BE5E1BC41D15002AEF13 /* Makefile */; settings = {ASSET_TAGS = (); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		36A0BE501BC4018D002AEF13 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -20,6 +25,9 @@
 
 /* Begin PBXFileReference section */
 		36A0BE521BC4018D002AEF13 /* HvcGtk */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HvcGtk; sourceTree = BUILT_PRODUCTS_DIR; };
+		36A0BE5C1BC41D15002AEF13 /* HvcGtk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = HvcGtk.c; sourceTree = "<group>"; };
+		36A0BE5D1BC41D15002AEF13 /* HvcGtk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HvcGtk.h; sourceTree = "<group>"; };
+		36A0BE5E1BC41D15002AEF13 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +44,9 @@
 		36A0BE491BC4018D002AEF13 = {
 			isa = PBXGroup;
 			children = (
+				36A0BE5C1BC41D15002AEF13 /* HvcGtk.c */,
+				36A0BE5D1BC41D15002AEF13 /* HvcGtk.h */,
+				36A0BE5E1BC41D15002AEF13 /* Makefile */,
 				36A0BE531BC4018D002AEF13 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -104,6 +115,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36A0BE601BC41D15002AEF13 /* Makefile in Sources */,
+				36A0BE5F1BC41D15002AEF13 /* HvcGtk.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,6 +233,7 @@
 				36A0BE5B1BC4018D002AEF13 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
