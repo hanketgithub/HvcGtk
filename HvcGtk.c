@@ -19,7 +19,7 @@
 
 #include "m31_hvc_api/HVC_types.h"
 #include "m31_hvc_api/HVC_encoder.h"
-#include "hvc_ui.h"
+#include "HvcGtk.h"
 
 
 
