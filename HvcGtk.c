@@ -83,8 +83,9 @@ GtkWidget *PixFmt420PRadioButton;
 GtkWidget *PixFmtBox;
 
 GtkWidget *GopLabel;
-GtkWidget *GopIpRadioButton;
 GtkWidget *GopIbRadioButton;
+GtkWidget *GopIpRadioButton;
+GtkWidget *GopIpbRadioButton;
 GtkWidget *GopIRadioButton;
 GtkWidget *GopBox;
 
@@ -756,7 +757,7 @@ static void callback_gop()
     GSList *list; 
     GtkToggleButton *button = NULL;
     
-    list = gtk_radio_button_get_group( GTK_RADIO_BUTTON(GopIpRadioButton) );
+    list = gtk_radio_button_get_group( GTK_RADIO_BUTTON(GopIbRadioButton) );
     
     while (list) // As long as we didn't reach the end of the group.
     {
@@ -771,22 +772,27 @@ static void callback_gop()
     
     const char *val = gtk_button_get_label( GTK_BUTTON(button) );
 
-    if (strcmp(val, "IPPP") == 0)
+    if (strcmp(val, "IP") == 0)
     {
         tApiHvcInitParam.eGopType = API_HVC_GOP_IP;
         gtk_widget_set_sensitive( GTK_WIDGET(bNumScale), FALSE);
     }
-    else if (strcmp(val, "IBBB") == 0)
+    else if (strcmp(val, "IB") == 0)
     {
         tApiHvcInitParam.eGopType = API_HVC_GOP_IB;
         gtk_widget_set_sensitive( GTK_WIDGET(bNumScale), TRUE);
     }
+    else if (strcmp(val, "IPB") == 0)
+    {
+        tApiHvcInitParam.eGopType = API_HVC_GOP_IPB;
+        gtk_widget_set_sensitive( GTK_WIDGET(bNumScale), TRUE);
+    }
     else if (strcmp(val, "I") == 0)
     {
-        tApiHvcInitParam.eGopType = API_HVC_GOP_I;
-        tApiHvcInitParam.eGopSize = API_HVC_GOP_SIZE_1;
-        tApiHvcInitParam.eIDRFrameNum = API_HVC_IDR_FRAME_ALL;
-        tApiHvcInitParam.eBFrameNum   = API_HVC_B_FRAME_NONE;
+        tApiHvcInitParam.eGopType       = API_HVC_GOP_I;
+        tApiHvcInitParam.eGopSize       = API_HVC_GOP_SIZE_1;
+        tApiHvcInitParam.eIDRFrameNum   = API_HVC_IDR_FRAME_ALL;
+        tApiHvcInitParam.eBFrameNum     = API_HVC_B_FRAME_NONE;
         gtk_widget_set_sensitive( GTK_WIDGET(bNumScale), FALSE); 
     }
     
@@ -798,18 +804,21 @@ static void gen_gop()
 {
     // GOP field
     GopLabel = gtk_label_new("GOP: ");
-    GopIpRadioButton = gtk_radio_button_new_with_label(NULL, "IBBB");
-    GopIbRadioButton = gtk_radio_button_new_with_label_from_widget( GTK_RADIO_BUTTON(GopIpRadioButton), "IPPP");
-    GopIRadioButton  = gtk_radio_button_new_with_label_from_widget( GTK_RADIO_BUTTON(GopIpRadioButton), "I");
+    GopIbRadioButton = gtk_radio_button_new_with_label(NULL, "IB");
+    GopIpRadioButton = gtk_radio_button_new_with_label_from_widget( GTK_RADIO_BUTTON(GopIbRadioButton), "IP");
+    GopIpbRadioButton = gtk_radio_button_new_with_label_from_widget( GTK_RADIO_BUTTON(GopIbRadioButton), "IPB");
+    GopIRadioButton  = gtk_radio_button_new_with_label_from_widget( GTK_RADIO_BUTTON(GopIbRadioButton), "I");
     
     // connect to signal
+    g_signal_connect(GopIbRadioButton, "toggled", callback_gop, NULL);
     g_signal_connect(GopIpRadioButton, "toggled", callback_gop, NULL);
-    g_signal_connect(GopIpRadioButton, "toggled", callback_gop, NULL);
+    g_signal_connect(GopIpbRadioButton, "toggled", callback_gop, NULL);
     g_signal_connect(GopIRadioButton,  "toggled", callback_gop, NULL);
     
     GopBox = gtk_box_new(FALSE, 5);
-    gtk_box_pack_start( GTK_BOX(GopBox), GopIpRadioButton, FALSE, FALSE, 0);
     gtk_box_pack_start( GTK_BOX(GopBox), GopIbRadioButton, FALSE, FALSE, 0);
+    gtk_box_pack_start( GTK_BOX(GopBox), GopIpRadioButton, FALSE, FALSE, 0);
+    gtk_box_pack_start( GTK_BOX(GopBox), GopIpbRadioButton, FALSE, FALSE, 0);
     gtk_box_pack_start( GTK_BOX(GopBox), GopIRadioButton,  FALSE, FALSE, 0);
     
     // Attatch GOP
@@ -1100,11 +1109,6 @@ static void *encode_thr_fn(void *data)
             str_level = "L4.1";
             break;
         }        
-        case API_HVC_HEVC_LEVEL_42:
-        {
-            str_level = "L4.2";
-            break;
-        }        
         case API_HVC_HEVC_LEVEL_50:
         {
             str_level = "L5.0";
@@ -1314,6 +1318,11 @@ static void *encode_thr_fn(void *data)
             str_gop = "IB";
             break;
         }
+        case API_HVC_GOP_IPB:
+        {
+            str_gop = "IPB";
+            break;
+        }
         default:
         {
             break;
@@ -1337,7 +1346,8 @@ static void *encode_thr_fn(void *data)
     LOG("IDR interval=%d\n", tApiHvcInitParam.eIDRFrameNum);
     
 
-    if (tApiHvcInitParam.eGopType == API_HVC_GOP_IB)
+    if ((tApiHvcInitParam.eGopType == API_HVC_GOP_IB)
+       || (tApiHvcInitParam.eGopType == API_HVC_GOP_IPB))
     {
         guint refnum;
     
@@ -1345,7 +1355,7 @@ static void *encode_thr_fn(void *data)
         
         tApiHvcInitParam.eBFrameNum = (API_HVC_B_FRAME_NUM_E) refnum;
 
-        LOG("ref#=%u\n", refnum);
+        LOG("B ref#=%u\n", refnum);
     }
 
     tApiHvcInitParam.tCoding.bDisableAMP = true;
