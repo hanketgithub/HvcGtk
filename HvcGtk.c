@@ -31,8 +31,8 @@ FILE *ui_logging;
 char err_msg[FILENAME_MAX];
 
 gchar *FilenameRawYUV[API_HVC_CHN_MAX];
-int fd_raw[API_HVC_CHN_MAX];
-int fd_es[API_HVC_CHN_MAX];
+int fd_r[API_HVC_CHN_MAX];
+int fd_w[API_HVC_CHN_MAX];
 
 
 GtkWidget *window;
@@ -68,8 +68,7 @@ GtkComboBoxText *ResCombo;
 
 GtkWidget *bitdepthLabel;
 GtkWidget *bitdepth8RadioButton;
-GtkWidget *bitdepthP010RadioButton;
-GtkWidget *bitdepthP10LERadioButton;
+GtkWidget *bitdepth10RadioButton;
 GtkWidget *bitdepthBox;
 
 GtkWidget *chromaLabel;
@@ -574,17 +573,9 @@ static void callback_bitdepth()
     {
         tApiHvcInitParam.eBitDepth = API_HVC_BIT_DEPTH_8;
     }
-    else if (strcmp(val, "P010") == 0)
+    else if (strcmp(val, "10") == 0)
     {
-        tApiHvcInitParam.eBitDepth = API_HVC_BIT_DEPTH_P010;
-    }
-    else if (strcmp(val, "P016") == 0)
-    {
-        tApiHvcInitParam.eBitDepth = API_HVC_BIT_DEPTH_P016;
-    }
-    else if (strcmp(val, "P10LE") == 0)
-    {
-        tApiHvcInitParam.eBitDepth = API_HVC_BIT_DEPTH_P10LE;
+        tApiHvcInitParam.eBitDepth = API_HVC_BIT_DEPTH_10;
     }
     
     LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -596,18 +587,15 @@ static void gen_bitdepth()
     bitdepthLabel = gtk_label_new ("Bitdepth: ");
     
     bitdepth8RadioButton = gtk_radio_button_new_with_label(NULL, "8");
-    bitdepthP010RadioButton = gtk_radio_button_new_with_label_from_widget( GTK_RADIO_BUTTON(bitdepth8RadioButton), "P010");
-    bitdepthP10LERadioButton = gtk_radio_button_new_with_label_from_widget( GTK_RADIO_BUTTON(bitdepth8RadioButton), "P10LE");
+    bitdepth10RadioButton = gtk_radio_button_new_with_label_from_widget( GTK_RADIO_BUTTON(bitdepth8RadioButton), "10");
     
     // connect to signal
-    g_signal_connect(bitdepth8RadioButton,    "toggled", callback_bitdepth, NULL);
-    g_signal_connect(bitdepthP010RadioButton, "toggled", callback_bitdepth, NULL);
-    g_signal_connect(bitdepthP10LERadioButton, "toggled", callback_bitdepth, NULL);
+    g_signal_connect(bitdepth8RadioButton,  "toggled", callback_bitdepth, NULL);
+    g_signal_connect(bitdepth10RadioButton, "toggled", callback_bitdepth, NULL);
     
     bitdepthBox = gtk_box_new(FALSE, 5);
     gtk_box_pack_start( GTK_BOX(bitdepthBox), bitdepth8RadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start( GTK_BOX(bitdepthBox), bitdepthP010RadioButton, FALSE, FALSE, 0);    
-    gtk_box_pack_start( GTK_BOX(bitdepthBox), bitdepthP10LERadioButton, FALSE, FALSE, 0);     
+    gtk_box_pack_start( GTK_BOX(bitdepthBox), bitdepth10RadioButton, FALSE, FALSE, 0);    
 
     // Attatch bitdepth
     gtk_grid_attach
@@ -925,13 +913,7 @@ static size_t calculate_vraw_enqueue_data_size (API_HVC_INIT_PARAM_T *p_init_par
             bit_depth = 8;
             break;
         }
-        case API_HVC_BIT_DEPTH_P10LE:
-        case API_HVC_BIT_DEPTH_P016:
-        {
-            bit_depth = 16;
-            break;
-        }
-        case API_HVC_BIT_DEPTH_P010:
+        case API_HVC_BIT_DEPTH_10:
         {
             bit_depth = 10;
             break;
@@ -1052,24 +1034,23 @@ static void ui_process_coded_frame(API_HVC_HEVC_CODED_PICT_T *p_coded_pict, void
 
     p = msg;
 
-    p += sprintf(p, "%s: board=%d, ch=%d, pts=%d, type=%d ",
+    p += sprintf(p, "%s: board=%d, ch=%d, pts=%lu, type=%d ",
         __FUNCTION__,
         eBoard, eCh,
-        p_coded_pict->u32pts,
+        p_coded_pict->pts,
         p_coded_pict->eFrameType);
         
     uint32_t i;
     for (i = 0; i < p_coded_pict->u32NalNum; i++)
     {
-        p += sprintf(p, "[NAL%u addr=%p, len=%u, type=%u]", 
+        p += sprintf(p, "[NAL%u len=%u, type=%u]", 
                         i,
-                        p_coded_pict->tNalInfo[i].pu8Addr,
                         p_coded_pict->tNalInfo[i].u32Length,
                         p_coded_pict->tNalInfo[i].eNalType);
   
-        if (fd_es[eCh])
+        if (fd_w[eCh])
         {
-            write(fd_es[eCh], p_coded_pict->tNalInfo[i].pu8Addr, p_coded_pict->tNalInfo[i].u32Length);
+            write(fd_w[eCh], p_coded_pict->tNalInfo[i].pu8Addr, p_coded_pict->tNalInfo[i].u32Length);
         }
     }
     LOG("%s\n", msg);
@@ -1270,21 +1251,11 @@ static void *encode_thr_fn(void *data)
             str_bitdepth = "8";
             break;
         }        
-        case API_HVC_BIT_DEPTH_P10LE:
+        case API_HVC_BIT_DEPTH_10:
         {
-            str_bitdepth = "P10LE";
+            str_bitdepth = "10";
             break;
-        }   
-        case API_HVC_BIT_DEPTH_P016:
-        {
-            str_bitdepth = "P016";
-            break;
-        }        
-        case API_HVC_BIT_DEPTH_P010:
-        {
-            str_bitdepth = "P010";
-            break;
-        }        
+        }
         default:
         {
             break;
@@ -1409,8 +1380,8 @@ static void *encode_thr_fn(void *data)
     make_timestamp(timestamp, sizeof(timestamp));
     make_output_file_name(timestamp, es_file_name, FILENAME_MAX);
 
-    fd_raw[eCh]  = open(FilenameRawYUV[eCh], O_RDONLY);
-    fd_es[eCh]   = open(es_file_name, 
+    fd_r[eCh]  = open(FilenameRawYUV[eCh], O_RDONLY);
+    fd_w[eCh]   = open(es_file_name, 
                     O_WRONLY | O_CREAT,
                     S_IRWXU);
                  
@@ -1419,7 +1390,7 @@ static void *encode_thr_fn(void *data)
     struct stat file_stat;
     int remain_frame = 0;
 
-    fstat(fd_raw[eCh], &file_stat);
+    fstat(fd_r[eCh], &file_stat);
 
     frame_sz = calculate_vraw_enqueue_data_size(&tApiHvcInitParam);
     remain_frame = ((uint64_t) file_stat.st_size / frame_sz);
@@ -1430,13 +1401,13 @@ static void *encode_thr_fn(void *data)
 
     while (remain_frame > 0)
     {        
-        read(fd_raw[eCh], vraw_data_buf_p, frame_sz);
+        read(fd_r[eCh], vraw_data_buf_p, frame_sz);
 
         remain_frame--;
 
         img.pu8Addr     = vraw_data_buf_p;
         img.u32Size     = frame_sz;
-        img.u32Pts      = GET_PTS_IN_MS(tPopEsArgs[eBoard][eCh].total_frame - remain_frame);
+        img.pts         = GET_PTS_IN_MS(tPopEsArgs[eBoard][eCh].total_frame - remain_frame);
         img.bLastFrame  = (remain_frame == 0) ? true : false;
 
         if (HVC_ENC_PushImage(eBoard, eCh, &img))
@@ -1469,7 +1440,7 @@ static void *encode_thr_fn(void *data)
     
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ProgressBar[eCh]), 0.0);
 
-    close(fd_es[eCh]);
+    close(fd_w[eCh]);
 
 callback_encode_ret:
     LOG("%s\n", err_msg);
