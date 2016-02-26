@@ -28,7 +28,7 @@
 #define GRID_ORDER_BAR          13
 
 
-#define GET_PTS_IN_MS(frame_order)    ((frame_order) * 1000 / tApiHvcInitParam.eTargetFrameRate)
+#define GET_PTS_IN_MS(eCh, frame_order)    ((frame_order) * 1000 / tApiHvcInitParam[eCh].eTargetFrameRate)
 
 
 #define FMB_TIMESTAMP_FORMAT        "%H%M%S"
