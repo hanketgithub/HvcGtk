@@ -14,18 +14,18 @@
 #define GRID_ORDER_FRAMERATE    4
 #define GRID_ORDER_BITRATE      5
 
-#define GRID_ORDER_BITDEPTH     0
-#define GRID_ORDER_CHROMA       1
-#define GRID_ORDER_PIX_FMT      2
+#define GRID_ORDER_BITDEPTH     6
+#define GRID_ORDER_CHROMA       7
+#define GRID_ORDER_PIX_FMT      8
 
-#define GRID_ORDER_GOP          0
-#define GRID_ORDER_GOP_SIZE     1
-#define GRID_ORDER_IDR_INTERVAL 2
-#define GRID_ORDER_BNUM         3
+#define GRID_ORDER_GOP          9
+#define GRID_ORDER_GOP_SIZE     10
+#define GRID_ORDER_IDR_INTERVAL 11
+#define GRID_ORDER_BNUM         12
 
-#define GRID_ORDER_OPEN         12
-#define GRID_ORDER_ENCODE       13
-#define GRID_ORDER_BAR          13
+#define GRID_ORDER_OPEN         13
+#define GRID_ORDER_ENCODE       14
+#define GRID_ORDER_BAR          14
 
 
 #define GET_PTS_IN_MS(eCh, frame_order)    ((frame_order) * 1000 / tApiHvcInitParam[eCh].eTargetFrameRate)
