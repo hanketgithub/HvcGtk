@@ -35,12 +35,15 @@
 #define FMB_ES_FILE_NAME_FORMAT     "es_%s.265"
 
 
+extern FILE *__hvc_encoder_logging__;
+extern FILE *ui_logging;
+
 #define LOG(fmt, ...) \
-    {   \
-        fprintf(ui_logging, "LOG: ");              \
-        fprintf(ui_logging, fmt, ##__VA_ARGS__);   \
-        fflush(ui_logging);                        \
-    }
+{   \
+    fprintf(ui_logging, "LOG: ");              \
+    fprintf(ui_logging, fmt, ##__VA_ARGS__);   \
+    fflush(ui_logging);                        \
+}
     
 
 typedef struct
@@ -62,6 +65,32 @@ typedef struct
     GtkWidget *window;
 } OPEN_CALLBACK_PARAM_T;
 
+
+
+
+extern GtkWidget *ProfileMainRadioButton[API_HVC_CHN_MAX];
+
+extern GtkWidget *Lv40RadioButton[API_HVC_CHN_MAX];
+
+extern GtkWidget *TierMainRadioButton[API_HVC_CHN_MAX];
+
+extern GtkComboBoxText *ResCombo;
+
+extern GtkComboBoxText *FramerateCombo;
+
+extern GtkWidget *Bitdepth8RadioButton;
+
+extern GtkWidget *Chroma420RadioButton;
+
+extern GtkWidget *PixFmtNV12RadioButton;
+
+extern GtkWidget *GopIbRadioButton;
+
+extern GtkWidget *BNumScale;
+
+extern API_HVC_IMG_T img;
+
+extern API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX];
 
 #endif
 

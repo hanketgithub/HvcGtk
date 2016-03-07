@@ -20,7 +20,7 @@
 #include "libhvc_venc/HVC_types.h"
 #include "libhvc_venc/HVC_encoder.h"
 #include "HvcGtk.h"
-
+#include "handler.h"
 
 
 /******************************
@@ -46,7 +46,6 @@ GtkWidget *ProfileMainRadioButton[API_HVC_CHN_MAX];
 GtkWidget *ProfileMain10RadioButton[API_HVC_CHN_MAX];
 GtkWidget *ProfileBox[API_HVC_CHN_MAX];
 
-
 GtkWidget *LvLabel[API_HVC_CHN_MAX];
 GtkWidget *Lv40RadioButton[API_HVC_CHN_MAX];
 GtkWidget *Lv41RadioButton[API_HVC_CHN_MAX];
@@ -54,23 +53,23 @@ GtkWidget *Lv50RadioButton[API_HVC_CHN_MAX];
 GtkWidget *Lv51RadioButton[API_HVC_CHN_MAX];
 GtkWidget *LvBox[API_HVC_CHN_MAX];
 
-GtkWidget *tierLabel;
-GtkWidget *tierMainRadioButton;
-GtkWidget *tierHighRadioButton;
-GtkWidget *tierBox;
+GtkWidget *TierLabel[API_HVC_CHN_MAX];
+GtkWidget *TierMainRadioButton[API_HVC_CHN_MAX];
+GtkWidget *TierHighRadioButton[API_HVC_CHN_MAX];
+GtkWidget *TierBox[API_HVC_CHN_MAX];
 
 GtkWidget *ResLabel;
 GtkComboBoxText *ResCombo;
 
-GtkWidget *bitdepthLabel;
-GtkWidget *bitdepth8RadioButton;
-GtkWidget *bitdepth10RadioButton;
-GtkWidget *bitdepthBox;
+GtkWidget *BitdepthLabel;
+GtkWidget *Bitdepth8RadioButton;
+GtkWidget *Bitdepth10RadioButton;
+GtkWidget *BitdepthBox;
 
-GtkWidget *chromaLabel;
-GtkWidget *chroma420RadioButton;
-GtkWidget *chroma422RadioButton;
-GtkWidget *chromaBox;
+GtkWidget *ChromaLabel;
+GtkWidget *Chroma420RadioButton;
+GtkWidget *Chroma422RadioButton;
+GtkWidget *ChromaBox;
 
 GtkWidget *PixFmtLabel;
 GtkWidget *PixFmtNV12RadioButton;
@@ -84,26 +83,37 @@ GtkWidget *GopIpbRadioButton;
 GtkWidget *GopIRadioButton;
 GtkWidget *GopBox;
 
-GtkWidget *gopSizeLabel;
-GtkWidget *gopSizeEntry;
+GtkWidget *GopSizeLabel;
+GtkWidget *GopSizeEntry;
 
-GtkWidget *idrIntervalLabel;
-GtkWidget *idrIntervalEntry;
+GtkWidget *IdrIntervalLabel;
+GtkWidget *IdrIntervalEntry;
 
-GtkWidget *bNumLabel;
-GtkWidget *bNumScale;
+GtkWidget *BNumLabel;
+GtkWidget *BNumScale;
 
 GtkWidget *FramerateLabel;
 GtkComboBoxText *FramerateCombo;
 
-GtkWidget *bitrateLabel;
-GtkWidget *bitrate;
+GtkWidget *BitrateLabel;
+GtkWidget *Bitrate;
 
 GtkWidget *OpenButton[API_HVC_CHN_MAX];
 GtkWidget *EncodeButton[API_HVC_CHN_MAX];
 GtkWidget *ProgressBar[API_HVC_CHN_MAX];
 
 API_HVC_IMG_T img;
+
+
+static POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
+static ENCODE_CALLBACK_PARAM_T tEncodeParam[API_HVC_CHN_MAX];
+static OPEN_CALLBACK_PARAM_T   tOpenParam[API_HVC_CHN_MAX];
+
+
+static API_HVC_CHN_E eCh1 = API_HVC_CHN_1;
+static API_HVC_CHN_E eCh2 = API_HVC_CHN_2;
+static API_HVC_CHN_E eCh3 = API_HVC_CHN_3;
+static API_HVC_CHN_E eCh4 = API_HVC_CHN_4;
 
 API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX] =
 {
@@ -128,79 +138,21 @@ API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX] =
     },
 };
 
-
-
-static POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
-static ENCODE_CALLBACK_PARAM_T tEncodeParam[API_HVC_CHN_MAX];
-static OPEN_CALLBACK_PARAM_T   tOpenParam[API_HVC_CHN_MAX];
-
-
-static API_HVC_CHN_E eCh1 = API_HVC_CHN_1;
-static API_HVC_CHN_E eCh2 = API_HVC_CHN_2;
-static API_HVC_CHN_E eCh3 = API_HVC_CHN_3;
-static API_HVC_CHN_E eCh4 = API_HVC_CHN_4;
-
-
-extern FILE *__hvc_encoder_logging__;
-
 /// Function Prototype
-static void callback_profile(GtkWidget *widget, gpointer *data);
 static void draw_profile(API_HVC_CHN_E *);
-static void callback_level(GtkWidget *widget, gpointer *data);
 static void draw_level(API_HVC_CHN_E *);
-static void callback_tier(GtkWidget *widget, gpointer *data);
 static void draw_tier(API_HVC_CHN_E *);
-static void callback_res(GtkWidget *widget, gpointer *data);
 static void draw_res(API_HVC_CHN_E *);
-static void callback_framerate(GtkWidget *widget, gpointer *data);
 static void draw_framerate(API_HVC_CHN_E *);
 static void draw_bitrate(API_HVC_CHN_E *);
-static void callback_bitdepth(GtkWidget *widget, gpointer *data);
 static void draw_bitdepth();
-static void callback_chroma(GtkWidget *widget, gpointer *data);
 static void draw_chroma();
-static void callback_pixfmt(GtkWidget *widget, gpointer *data);
 static void draw_pixfmt();
-static void callback_gop(GtkWidget *widget, gpointer *data);
 static void draw_gop();
 static void draw_gop_size();
 static void draw_idr_interval();
 static void draw_b_frame_num();
 
-
-/// Basic
-static void callback_profile(GtkWidget *widget, gpointer *data)
-{    
-    GSList *list; 
-    GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-    
-    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(ProfileMainRadioButton[eCh]));
-    
-    while (list) // As long as we didn't reach the end of the group.
-    {
-        button = list->data;    // Get one of the buttons in the group.
-        list = list->next;      // Next time we're going to check this one.
-
-        if (gtk_toggle_button_get_active(button))
-        {
-            break;
-        }
-    }
-    
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
-    
-    if (strcmp(val, "Main") == 0)
-    {
-        tApiHvcInitParam[eCh].eProfile = API_HVC_HEVC_MAIN_PROFILE;
-    }
-    else if (strcmp(val, "Main10") == 0)
-    {
-        tApiHvcInitParam[eCh].eProfile = API_HVC_HEVC_MAIN10_PROFILE;
-    }
-
-    LOG("%s: %s selected\n", __FUNCTION__, val);
-}
 
 static void draw_profile(API_HVC_CHN_E *pCh)
 {
@@ -212,8 +164,8 @@ static void draw_profile(API_HVC_CHN_E *pCh)
     ProfileMain10RadioButton[eCh]   = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(ProfileMainRadioButton[eCh]), "Main10");
     
     // connecto to signal
-    g_signal_connect(ProfileMainRadioButton[eCh],   "toggled", (GCallback) callback_profile, pCh);
-    g_signal_connect(ProfileMain10RadioButton[eCh], "toggled", (GCallback) callback_profile, pCh);
+    g_signal_connect(ProfileMainRadioButton[eCh],   "toggled", G_CALLBACK(handler_profile), pCh);
+    g_signal_connect(ProfileMain10RadioButton[eCh], "toggled", G_CALLBACK(handler_profile), pCh);
     
     ProfileBox[eCh] = gtk_box_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(ProfileBox[eCh]), ProfileMainRadioButton[eCh], FALSE, FALSE, 0);
@@ -235,46 +187,6 @@ static void draw_profile(API_HVC_CHN_E *pCh)
     );    
 }
 
-static void callback_level(GtkWidget *widget, gpointer *data)
-{
-    GSList *list; 
-    GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-    
-    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(Lv40RadioButton[eCh]));
-    
-    while (list) // As long as we didn't reach the end of the group.
-    {
-        button = list->data;    // Get one of the buttons in the group.
-        list = list->next;      // Next time we're going to check this one.
-
-        if (gtk_toggle_button_get_active(button))
-        {
-            break;
-        }
-    }
-    
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
-    
-    if (strcmp(val, "4.0") == 0)
-    {
-        tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_40;
-    }
-    else if (strcmp(val, "4.1") == 0)
-    {
-        tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_41;
-    }
-    else if (strcmp(val, "5.0") == 0)
-    {
-        tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_50;
-    }
-    else if (strcmp(val, "5.1") == 0)
-    {
-        tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_51;
-    }
-    
-    LOG("%s: %s selected\n", __FUNCTION__, val);
-}
 
 static void draw_level(API_HVC_CHN_E *pCh)
 {
@@ -288,10 +200,10 @@ static void draw_level(API_HVC_CHN_E *pCh)
     Lv51RadioButton[eCh] = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Lv40RadioButton[eCh]), "5.1");
 
     // connecto to signal
-    g_signal_connect(Lv40RadioButton[eCh], "toggled", (GCallback) callback_level, &eCh1);
-    g_signal_connect(Lv41RadioButton[eCh], "toggled", (GCallback) callback_level, &eCh1);
-    g_signal_connect(Lv50RadioButton[eCh], "toggled", (GCallback) callback_level, &eCh1);
-    g_signal_connect(Lv51RadioButton[eCh], "toggled", (GCallback) callback_level, &eCh1);
+    g_signal_connect(Lv40RadioButton[eCh], "toggled", G_CALLBACK(handler_level), &eCh1);
+    g_signal_connect(Lv41RadioButton[eCh], "toggled", G_CALLBACK(handler_level), &eCh1);
+    g_signal_connect(Lv50RadioButton[eCh], "toggled", G_CALLBACK(handler_level), &eCh1);
+    g_signal_connect(Lv51RadioButton[eCh], "toggled", G_CALLBACK(handler_level), &eCh1);
     
     LvBox[eCh] = gtk_box_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(LvBox[eCh]), Lv40RadioButton[eCh], FALSE, FALSE, 0);
@@ -315,101 +227,38 @@ static void draw_level(API_HVC_CHN_E *pCh)
     );    
 }
 
-static void callback_tier(GtkWidget *widget, gpointer *data)
-{
-    GSList *list; 
-    GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-    
-    list = gtk_radio_button_get_group( GTK_RADIO_BUTTON(tierMainRadioButton) );
-    
-    while (list) // As long as we didn't reach the end of the group.
-    {
-        button = list->data;    // Get one of the buttons in the group.
-        list = list->next;      // Next time we're going to check this one.
-
-        if (gtk_toggle_button_get_active(button))
-        {
-            break;
-        }
-    }
-    
-    const char *val = gtk_button_get_label( GTK_BUTTON(button) );
-    
-    if (strcmp(val, "Main") == 0)
-    {
-        tApiHvcInitParam[eCh].eTier = API_HVC_HEVC_MAIN_TIER;
-    }
-    else if (strcmp(val, "High") == 0)
-    {
-        tApiHvcInitParam[eCh].eTier = API_HVC_HEVC_HIGH_TIER;
-    }
-    
-    LOG("%s: %s selected\n", __FUNCTION__, val);
-}
 
 static void draw_tier(API_HVC_CHN_E *pCh)
 {
     API_HVC_CHN_E eCh = *pCh;
 
     // Tier field
-    tierLabel = gtk_label_new ("Tier: ");
-    tierMainRadioButton = gtk_radio_button_new_with_label(NULL, "Main");
-    tierHighRadioButton = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(tierMainRadioButton), "High");
+    TierLabel[eCh] = gtk_label_new ("Tier: ");
+    TierMainRadioButton[eCh] = gtk_radio_button_new_with_label(NULL, "Main");
+    TierHighRadioButton[eCh] = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(TierMainRadioButton[eCh]), "High");
     
-    tierBox = gtk_box_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(tierBox), tierMainRadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(tierBox), tierHighRadioButton, FALSE, FALSE, 0);
+    TierBox[eCh] = gtk_box_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(TierBox[eCh]), TierMainRadioButton[eCh], FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(TierBox[eCh]), TierHighRadioButton[eCh], FALSE, FALSE, 0);
     
     // connect to signal
-    g_signal_connect(tierMainRadioButton, "toggled", (GCallback) callback_tier, &eCh1);
-    g_signal_connect(tierHighRadioButton, "toggled", (GCallback) callback_tier, &eCh1);
+    g_signal_connect(TierMainRadioButton[eCh], "toggled", G_CALLBACK(handler_tier), &eCh1);
+    g_signal_connect(TierHighRadioButton[eCh], "toggled", G_CALLBACK(handler_tier), &eCh1);
 
     // Attatch tier
     gtk_grid_attach
     (
         GridCh[eCh],
-        tierLabel,
+        TierLabel[eCh],
         0, GRID_ORDER_TIER, 1, 1
     );
 
     gtk_grid_attach
     (
         GridCh[eCh],
-        tierBox,
+        TierBox[eCh],
         1, GRID_ORDER_TIER, 1, 1
     );    
-}
-
-static void callback_res(GtkWidget *widget, gpointer *data)
-{
-    gchar *val = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-    
-    val = gtk_combo_box_text_get_active_text(ResCombo);
-
-    if (strcmp(val, "3840x2160") == 0)
-    {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_3840x2160;
-    }
-    else if (strcmp(val, "1920x1080") == 0)
-    {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_1920x1080;
-    }
-    else if (strcmp(val, "1280x720") == 0)
-    {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_1280x720;
-    }
-    else if (strcmp(val, "720x576") == 0)
-    {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_720x576;
-    }
-    else if (strcmp(val, "720x480") == 0)
-    {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_720x480;
-    }
-        
-    LOG("%s: %s selected\n", __FUNCTION__, val);
 }
 
 static void draw_res(API_HVC_CHN_E *pCh)
@@ -448,7 +297,7 @@ static void draw_res(API_HVC_CHN_E *pCh)
     gtk_combo_box_set_active(GTK_COMBO_BOX(ResCombo), 0);
     
     // connect to signal    
-    g_signal_connect(ResCombo, "changed", (GCallback) callback_res, &eCh1);
+    g_signal_connect(ResCombo, "changed", G_CALLBACK(handler_res), &eCh1);
 
     // Attatch resolution
     gtk_grid_attach
@@ -464,45 +313,6 @@ static void draw_res(API_HVC_CHN_E *pCh)
         GTK_WIDGET(ResCombo),
         1, GRID_ORDER_RESOLUTION, 1, 1
     );    
-}
-
-static void callback_framerate(GtkWidget *widget, gpointer *data)
-{
-    gchar *val = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-
-    val = gtk_combo_box_text_get_active_text(FramerateCombo);
-    
-    if (strcmp(val, "24") == 0)
-    {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_24;
-    }
-    else if (strcmp(val, "25") == 0)
-    {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_25;
-    }
-    else if (strcmp(val, "29.97") == 0)
-    {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_29_97;
-    }
-    else if (strcmp(val, "30") == 0)
-    {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_30;
-    }
-    else if (strcmp(val, "50") == 0)
-    {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_50;
-    }
-    else if (strcmp(val, "59.94") == 0)
-    {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_59_94;
-    }
-    else if (strcmp(val, "60") == 0)
-    {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_60;
-    }
-
-    LOG("%s: %s selected\n", __FUNCTION__, val);
 }
 
 static void draw_framerate(API_HVC_CHN_E *pCh)
@@ -550,7 +360,7 @@ static void draw_framerate(API_HVC_CHN_E *pCh)
     
     gtk_combo_box_set_active(GTK_COMBO_BOX(FramerateCombo), 0);
     
-    g_signal_connect(FramerateCombo, "changed" , (GCallback) callback_framerate, &eCh1);
+    g_signal_connect(FramerateCombo, "changed" , G_CALLBACK(handler_framerate), &eCh1);
     
     // Attatch framerate
     gtk_grid_attach
@@ -572,57 +382,24 @@ static void draw_bitrate(API_HVC_CHN_E *pCh)
 {
     API_HVC_CHN_E eCh = *pCh;
 
-    // bitrate field
-    bitrateLabel    = gtk_label_new ("Bitrate (kbps): ");
-    bitrate         = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 1000.0, 32000.0, 1000.0);
+    // Bitrate field
+    BitrateLabel    = gtk_label_new ("Bitrate (kbps): ");
+    Bitrate         = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 1000.0, 32000.0, 1000.0);
 
-    // Attach bitrate
+    // Attach Bitrate
     gtk_grid_attach
     (
         GridCh[eCh],
-        bitrateLabel,
+        BitrateLabel,
         0, GRID_ORDER_BITRATE, 1, 1
     );
 
     gtk_grid_attach
     (
         GridCh[eCh],
-        bitrate,
+        Bitrate,
         1, GRID_ORDER_BITRATE, 1, 1
     );
-}
-
-static void callback_bitdepth(GtkWidget *widget, gpointer *data)
-{
-    GSList *list; 
-    GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-    
-    list = gtk_radio_button_get_group( GTK_RADIO_BUTTON(bitdepth8RadioButton) );
-    
-    while (list) // As long as we didn't reach the end of the group.
-    {
-        button = list->data;    // Get one of the buttons in the group.
-        list = list->next;      // Next time we're going to check this one.
-
-        if (gtk_toggle_button_get_active(button))
-        {
-            break;
-        }
-    }
-    
-    const char *val = gtk_button_get_label( GTK_BUTTON(button) );
-    
-    if (strcmp(val, "8") == 0)
-    {
-        tApiHvcInitParam[eCh].eBitDepth = API_HVC_BIT_DEPTH_8;
-    }
-    else if (strcmp(val, "10") == 0)
-    {
-        tApiHvcInitParam[eCh].eBitDepth = API_HVC_BIT_DEPTH_10;
-    }
-    
-    LOG("%s: %s selected\n", __FUNCTION__, val);
 }
 
 static void draw_bitdepth(API_HVC_CHN_E *pCh)
@@ -630,66 +407,33 @@ static void draw_bitdepth(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // Bitdepth field
-    bitdepthLabel = gtk_label_new ("Bitdepth: ");
+    BitdepthLabel = gtk_label_new ("Bitdepth: ");
     
-    bitdepth8RadioButton = gtk_radio_button_new_with_label(NULL, "8");
-    bitdepth10RadioButton = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(bitdepth8RadioButton), "10");
+    Bitdepth8RadioButton = gtk_radio_button_new_with_label(NULL, "8");
+    Bitdepth10RadioButton = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Bitdepth8RadioButton), "10");
     
     // connect to signal
-    g_signal_connect(bitdepth8RadioButton,  "toggled", (GCallback) callback_bitdepth, &eCh1);
-    g_signal_connect(bitdepth10RadioButton, "toggled", (GCallback) callback_bitdepth, &eCh1);
+    g_signal_connect(Bitdepth8RadioButton,  "toggled", G_CALLBACK(handler_bitdepth), &eCh1);
+    g_signal_connect(Bitdepth10RadioButton, "toggled", G_CALLBACK(handler_bitdepth), &eCh1);
     
-    bitdepthBox = gtk_box_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(bitdepthBox), bitdepth8RadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(bitdepthBox), bitdepth10RadioButton, FALSE, FALSE, 0);    
+    BitdepthBox = gtk_box_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(BitdepthBox), Bitdepth8RadioButton, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(BitdepthBox), Bitdepth10RadioButton, FALSE, FALSE, 0);    
 
     // Attatch bitdepth
     gtk_grid_attach
     (
         GridCh[eCh],
-        bitdepthLabel,
+        BitdepthLabel,
         0, GRID_ORDER_BITDEPTH, 1, 1
     );
     
     gtk_grid_attach
     (
         GridCh[eCh],
-        bitdepthBox,
+        BitdepthBox,
         1, GRID_ORDER_BITDEPTH, 1, 1
     );     
-}
-
-static void callback_chroma(GtkWidget *widget, gpointer *data)
-{
-    GSList *list; 
-    GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-    
-    list = gtk_radio_button_get_group( GTK_RADIO_BUTTON(chroma420RadioButton) );
-    
-    while (list) // As long as we didn't reach the end of the group.
-    {
-        button = list->data;    // Get one of the buttons in the group.
-        list = list->next;      // Next time we're going to check this one.
-
-        if (gtk_toggle_button_get_active(button))
-        {
-            break;
-        }
-    }
-    
-    const char *val = gtk_button_get_label( GTK_BUTTON(button) );
-    
-    if (strcmp(val, "420") == 0)
-    {
-        tApiHvcInitParam[eCh].eChromaFmt = API_HVC_CHROMA_FORMAT_420;
-    }
-    else if (strcmp(val, "422") == 0)
-    {
-        tApiHvcInitParam[eCh].eChromaFmt = API_HVC_CHROMA_FORMAT_422;
-    }
-    
-    LOG("%s: %s selected\n", __FUNCTION__, val);
 }
 
 static void draw_chroma(API_HVC_CHN_E *pCh)
@@ -697,65 +441,32 @@ static void draw_chroma(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // Chroma field
-    chromaLabel = gtk_label_new("Chroma: ");
-    chroma420RadioButton = gtk_radio_button_new_with_label(NULL, "420");
-    chroma422RadioButton = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(chroma420RadioButton), "422");
+    ChromaLabel = gtk_label_new("Chroma: ");
+    Chroma420RadioButton = gtk_radio_button_new_with_label(NULL, "420");
+    Chroma422RadioButton = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Chroma420RadioButton), "422");
     
     // connect to signal
-    g_signal_connect(chroma420RadioButton, "toggled", (GCallback) callback_chroma, &eCh1);
-    g_signal_connect(chroma420RadioButton, "toggled", (GCallback) callback_chroma, &eCh1);
+    g_signal_connect(Chroma420RadioButton, "toggled", G_CALLBACK(handler_chroma), &eCh1);
+    g_signal_connect(Chroma420RadioButton, "toggled", G_CALLBACK(handler_chroma), &eCh1);
     
-    chromaBox = gtk_box_new(FALSE, 5);
-    gtk_box_pack_start( GTK_BOX(chromaBox), chroma420RadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start( GTK_BOX(chromaBox), chroma422RadioButton, FALSE, FALSE, 0);
+    ChromaBox = gtk_box_new(FALSE, 5);
+    gtk_box_pack_start( GTK_BOX(ChromaBox), Chroma420RadioButton, FALSE, FALSE, 0);
+    gtk_box_pack_start( GTK_BOX(ChromaBox), Chroma422RadioButton, FALSE, FALSE, 0);
 
     // Attatch chroma
     gtk_grid_attach
     (
         GridCh[eCh],
-        chromaLabel,
+        ChromaLabel,
         0, GRID_ORDER_CHROMA, 1, 1
     );
 
     gtk_grid_attach
     (
         GridCh[eCh],
-        chromaBox,
+        ChromaBox,
         1, GRID_ORDER_CHROMA, 1, 1
     );
-}
-
-static void callback_pixfmt(GtkWidget *widget, gpointer *data)
-{
-    GSList *list; 
-    GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-    
-    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(PixFmtNV12RadioButton));
-    
-    while (list) // As long as we didn't reach the end of the group.
-    {
-        button = list->data;    // Get one of the buttons in the group.
-        list = list->next;      // Next time we're going to check this one.
-
-        if (gtk_toggle_button_get_active(button))
-        {
-            break;
-        }
-    }
-    
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
-    
-    if (strcmp(val, "NV12") == 0)
-    {
-        img.eFormat = API_HVC_IMAGE_FORMAT_NV12;
-    }
-    else if (strcmp(val, "420P") == 0)
-    {
-        img.eFormat = API_HVC_IMAGE_FORMAT_YUV420;
-    }
-    
-    LOG("%s: %s selected\n", __FUNCTION__, val);
 }
 
 static void draw_pixfmt(API_HVC_CHN_E *pCh)
@@ -768,8 +479,8 @@ static void draw_pixfmt(API_HVC_CHN_E *pCh)
     PixFmt420PRadioButton = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(PixFmtNV12RadioButton), "420P");
     
     // connect to signal
-    g_signal_connect(PixFmtNV12RadioButton, "toggled", (GCallback) callback_pixfmt, &eCh1);
-    g_signal_connect(PixFmt420PRadioButton, "toggled", (GCallback) callback_pixfmt, &eCh1);
+    g_signal_connect(PixFmtNV12RadioButton, "toggled", G_CALLBACK(handler_pixfmt), &eCh1);
+    g_signal_connect(PixFmt420PRadioButton, "toggled", G_CALLBACK(handler_pixfmt), &eCh1);
     
     PixFmtBox = gtk_box_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(PixFmtBox), PixFmtNV12RadioButton, FALSE, FALSE, 0);
@@ -791,54 +502,6 @@ static void draw_pixfmt(API_HVC_CHN_E *pCh)
     );
 }
 
-static void callback_gop(GtkWidget *widget, gpointer *data)
-{
-    GSList *list; 
-    GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-    
-    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(GopIbRadioButton));
-    
-    while (list) // As long as we didn't reach the end of the group.
-    {
-        button = list->data;    // Get one of the buttons in the group.
-        list = list->next;      // Next time we're going to check this one.
-
-        if (gtk_toggle_button_get_active(button))
-        {
-            break;
-        }
-    }
-    
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
-
-    if (strcmp(val, "IP") == 0)
-    {
-        tApiHvcInitParam[eCh].eGopType = API_HVC_GOP_IP;
-        gtk_widget_set_sensitive(GTK_WIDGET(bNumScale), FALSE);
-    }
-    else if (strcmp(val, "IB") == 0)
-    {
-        tApiHvcInitParam[eCh].eGopType = API_HVC_GOP_IB;
-        gtk_widget_set_sensitive(GTK_WIDGET(bNumScale), TRUE);
-    }
-    else if (strcmp(val, "IPB") == 0)
-    {
-        tApiHvcInitParam[eCh].eGopType = API_HVC_GOP_IPB;
-        gtk_widget_set_sensitive(GTK_WIDGET(bNumScale), TRUE);
-    }
-    else if (strcmp(val, "I") == 0)
-    {
-        tApiHvcInitParam[eCh].eGopType       = API_HVC_GOP_I;
-        tApiHvcInitParam[eCh].eGopSize       = API_HVC_GOP_SIZE_1;
-        tApiHvcInitParam[eCh].eIDRFrameNum   = API_HVC_IDR_FRAME_ALL;
-        tApiHvcInitParam[eCh].eBFrameNum     = API_HVC_B_FRAME_NONE;
-        gtk_widget_set_sensitive(GTK_WIDGET(bNumScale), FALSE); 
-    }
-    
-    LOG("%s: %s selected\n", __FUNCTION__, val);
-}
-
 static void draw_gop(API_HVC_CHN_E *pCh)
 {
     API_HVC_CHN_E eCh = *pCh;
@@ -851,10 +514,10 @@ static void draw_gop(API_HVC_CHN_E *pCh)
     GopIRadioButton     = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(GopIbRadioButton), "I");
     
     // connect to signal
-    g_signal_connect(GopIbRadioButton,  "toggled", (GCallback) callback_gop, &eCh1);
-    g_signal_connect(GopIpRadioButton,  "toggled", (GCallback) callback_gop, &eCh1);
-    g_signal_connect(GopIpbRadioButton, "toggled", (GCallback) callback_gop, &eCh1);
-    g_signal_connect(GopIRadioButton,   "toggled", (GCallback) callback_gop, &eCh1);
+    g_signal_connect(GopIbRadioButton,  "toggled", G_CALLBACK(handler_gop), &eCh1);
+    g_signal_connect(GopIpRadioButton,  "toggled", G_CALLBACK(handler_gop), &eCh1);
+    g_signal_connect(GopIpbRadioButton, "toggled", G_CALLBACK(handler_gop), &eCh1);
+    g_signal_connect(GopIRadioButton,   "toggled", G_CALLBACK(handler_gop), &eCh1);
     
     GopBox = gtk_box_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(GopBox), GopIbRadioButton, FALSE, FALSE, 0);
@@ -883,23 +546,23 @@ static void draw_gop_size(API_HVC_CHN_E *pCh)
 {
     API_HVC_CHN_E eCh = *pCh;
 
-    gopSizeLabel = gtk_label_new("GOP Size: ");
-    gopSizeEntry = gtk_entry_new();
+    GopSizeLabel = gtk_label_new("GOP Size: ");
+    GopSizeEntry = gtk_entry_new();
 
-    gtk_entry_set_text(GTK_ENTRY(gopSizeEntry), "64");
+    gtk_entry_set_text(GTK_ENTRY(GopSizeEntry), "64");
 
     // Attatch GOP size
     gtk_grid_attach
     (
         GridCh[eCh],
-        gopSizeLabel,
+        GopSizeLabel,
         0, GRID_ORDER_GOP_SIZE, 1, 1
     );
     
     gtk_grid_attach
     (
         GridCh[eCh],
-        gopSizeEntry,
+        GopSizeEntry,
         1, GRID_ORDER_GOP_SIZE, 1, 1
     );     
 }
@@ -908,23 +571,23 @@ static void draw_idr_interval(API_HVC_CHN_E *pCh)
 {
     API_HVC_CHN_E eCh = *pCh;
 
-    idrIntervalLabel = gtk_label_new("IDR Interval: ");
-    idrIntervalEntry = gtk_entry_new();
+    IdrIntervalLabel = gtk_label_new("IDR Interval: ");
+    IdrIntervalEntry = gtk_entry_new();
 
-    gtk_entry_set_text(GTK_ENTRY(idrIntervalEntry), "0");
+    gtk_entry_set_text(GTK_ENTRY(IdrIntervalEntry), "0");
 
     // Attatch GOP size
     gtk_grid_attach
     (
         GridCh[eCh],
-        idrIntervalLabel,
+        IdrIntervalLabel,
         0, GRID_ORDER_IDR_INTERVAL, 1, 1
     );
     
     gtk_grid_attach
     (
         GridCh[eCh],
-        idrIntervalEntry,
+        IdrIntervalEntry,
         1, GRID_ORDER_IDR_INTERVAL, 1, 1
     );     
 }
@@ -934,21 +597,21 @@ static void draw_b_frame_num(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // Ref frame number
-    bNumLabel = gtk_label_new("B frame #: ");
-    bNumScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 1.0, 8.0, 1.0);
+    BNumLabel = gtk_label_new("B frame #: ");
+    BNumScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 1.0, 8.0, 1.0);
     
     // Attatch ref
     gtk_grid_attach
     (
         GridCh[eCh],
-        bNumLabel,
+        BNumLabel,
         0, GRID_ORDER_BNUM, 1, 1
     );
     
     gtk_grid_attach
     (
         GridCh[eCh],
-        bNumScale,
+        BNumScale,
         1, GRID_ORDER_BNUM, 1, 1
     ); 
 }
@@ -1293,7 +956,7 @@ static void *encode_thr_fn(void *data)
     
     guint bitrate_val;
 
-    bitrate_val = gtk_range_get_value( GTK_RANGE(bitrate) );
+    bitrate_val = gtk_range_get_value( GTK_RANGE(Bitrate) );
     
     LOG("Bitrate %d kbps\n", bitrate_val);
     
@@ -1362,14 +1025,14 @@ static void *encode_thr_fn(void *data)
 
     if (tApiHvcInitParam[eCh].eGopType != API_HVC_GOP_I)
     {
-        tApiHvcInitParam[eCh].eGopSize = atoi(gtk_entry_get_text( GTK_ENTRY(gopSizeEntry) ));
+        tApiHvcInitParam[eCh].eGopSize = atoi(gtk_entry_get_text( GTK_ENTRY(GopSizeEntry) ));
     }
 
     LOG("GOP size=%d\n", tApiHvcInitParam[eCh].eGopSize);
 
     if (tApiHvcInitParam[eCh].eGopType != API_HVC_GOP_I)
     {
-        tApiHvcInitParam[eCh].eIDRFrameNum = atoi(gtk_entry_get_text( GTK_ENTRY(idrIntervalEntry) ));
+        tApiHvcInitParam[eCh].eIDRFrameNum = atoi(gtk_entry_get_text( GTK_ENTRY(IdrIntervalEntry) ));
     }
 
     LOG("IDR interval=%d\n", tApiHvcInitParam[eCh].eIDRFrameNum);
@@ -1380,7 +1043,7 @@ static void *encode_thr_fn(void *data)
     {
         guint refnum;
     
-        refnum = gtk_range_get_value( GTK_RANGE(bNumScale) );
+        refnum = gtk_range_get_value( GTK_RANGE(BNumScale) );
         
         tApiHvcInitParam[eCh].eBFrameNum = (API_HVC_B_FRAME_NUM_E) refnum;
 
@@ -1591,9 +1254,9 @@ int main(int argc, char *argv[])
 {
     ui_logging = fopen("log_ui.txt", "w");
     __hvc_encoder_logging__ = fopen("log_api.txt", "w");
-    
+ 
     gtk_init(&argc, &argv);
-    
+ 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
     gtk_window_set_title(GTK_WINDOW (window), "HVC-8700");
@@ -1607,6 +1270,7 @@ int main(int argc, char *argv[])
 
     GridCh[eCh1] = GTK_GRID(gtk_grid_new());
     GridCh[eCh2] = GTK_GRID(gtk_grid_new());
+
 
     // Create Channel 1 panel
     draw_profile(&eCh1);
