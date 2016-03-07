@@ -66,7 +66,10 @@ typedef struct
 } OPEN_CALLBACK_PARAM_T;
 
 
-
+extern gchar *FilenameRawYUV[API_HVC_CHN_MAX];
+extern int fd_r[API_HVC_CHN_MAX];
+extern int fd_w[API_HVC_CHN_MAX];
+extern char err_msg[FILENAME_MAX];
 
 extern GtkWidget *ProfileMainRadioButton[API_HVC_CHN_MAX];
 
@@ -80,16 +83,25 @@ extern GtkComboBoxText *FpsCombo[API_HVC_CHN_MAX];
 
 extern GtkWidget *Bitdepth8RadioButton[API_HVC_CHN_MAX];
 
+extern GtkWidget *Bitrate[API_HVC_CHN_MAX];
+
 extern GtkWidget *Chroma420RadioButton[API_HVC_CHN_MAX];
 
 extern GtkWidget *PixFmtNV12RadioButton[API_HVC_CHN_MAX];
 
-extern GtkWidget *GopIbRadioButton;
+extern GtkWidget *GopIbRadioButton[API_HVC_CHN_MAX];
 
-extern GtkWidget *BNumScale;
+extern GtkWidget *GopSizeEntry[API_HVC_CHN_MAX];
+
+extern GtkWidget *IdrIntervalEntry[API_HVC_CHN_MAX];
+
+extern GtkWidget *BNumScale[API_HVC_CHN_MAX];
+
+extern GtkWidget *ProgressBar[API_HVC_CHN_MAX];
+
 
 extern API_HVC_IMG_T img;
-
+extern POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
 extern API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX];
 
 #endif

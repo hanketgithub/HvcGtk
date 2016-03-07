@@ -82,21 +82,21 @@ GtkWidget *PixFmtNV12RadioButton[API_HVC_CHN_MAX];
 GtkWidget *PixFmt420PRadioButton[API_HVC_CHN_MAX];
 GtkWidget *PixFmtBox[API_HVC_CHN_MAX];
 
-GtkWidget *GopLabel;
-GtkWidget *GopIbRadioButton;
-GtkWidget *GopIpRadioButton;
-GtkWidget *GopIpbRadioButton;
-GtkWidget *GopIRadioButton;
-GtkWidget *GopBox;
+GtkWidget *GopLabel[API_HVC_CHN_MAX];
+GtkWidget *GopIbRadioButton[API_HVC_CHN_MAX];
+GtkWidget *GopIpRadioButton[API_HVC_CHN_MAX];
+GtkWidget *GopIpbRadioButton[API_HVC_CHN_MAX];
+GtkWidget *GopIRadioButton[API_HVC_CHN_MAX];
+GtkWidget *GopBox[API_HVC_CHN_MAX];
 
-GtkWidget *GopSizeLabel;
-GtkWidget *GopSizeEntry;
+GtkWidget *GopSizeLabel[API_HVC_CHN_MAX];
+GtkWidget *GopSizeEntry[API_HVC_CHN_MAX];
 
-GtkWidget *IdrIntervalLabel;
-GtkWidget *IdrIntervalEntry;
+GtkWidget *IdrIntervalLabel[API_HVC_CHN_MAX];
+GtkWidget *IdrIntervalEntry[API_HVC_CHN_MAX];
 
-GtkWidget *BNumLabel;
-GtkWidget *BNumScale;
+GtkWidget *BNumLabel[API_HVC_CHN_MAX];
+GtkWidget *BNumScale[API_HVC_CHN_MAX];
 
 
 GtkWidget *OpenButton[API_HVC_CHN_MAX];
@@ -104,9 +104,7 @@ GtkWidget *EncodeButton[API_HVC_CHN_MAX];
 GtkWidget *ProgressBar[API_HVC_CHN_MAX];
 
 API_HVC_IMG_T img;
-
-
-static POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
+POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
 static ENCODE_CALLBACK_PARAM_T tEncodeParam[API_HVC_CHN_MAX];
 static OPEN_CALLBACK_PARAM_T   tOpenParam[API_HVC_CHN_MAX];
 
@@ -118,6 +116,25 @@ static API_HVC_CHN_E eCh4 = API_HVC_CHN_4;
 
 API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX] =
 {
+    {
+        .eInputMode     = API_HVC_INPUT_MODE_DATA,
+        .eProfile       = API_HVC_HEVC_MAIN_PROFILE,
+        .eLevel         = API_HVC_HEVC_LEVEL_40,
+        .eTier          = API_HVC_HEVC_MAIN_TIER,
+        
+        .eResolution    = API_HVC_RESOLUTION_3840x2160,
+        .eChromaFmt     = API_HVC_CHROMA_FORMAT_420,
+        .eBitDepth      = API_HVC_BIT_DEPTH_8,
+
+        .eGopType       = API_HVC_GOP_IB,
+        .eGopSize       = API_HVC_GOP_SIZE_64,
+        .eBFrameNum     = API_HVC_B_FRAME_ONE,
+        
+        .eTargetFrameRate = API_HVC_FPS_24,
+        .u32Bitrate     = 32000,
+        
+        .eDbgLevel = API_HVC_DBG_LEVEL_3,
+    },
     {
         .eInputMode     = API_HVC_INPUT_MODE_DATA,
         .eProfile       = API_HVC_HEVC_MAIN_PROFILE,
@@ -201,10 +218,10 @@ static void draw_level(API_HVC_CHN_E *pCh)
     Lv51RadioButton[eCh] = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Lv40RadioButton[eCh]), "5.1");
 
     // connecto to signal
-    g_signal_connect(Lv40RadioButton[eCh], "toggled", G_CALLBACK(handler_level), &eCh1);
-    g_signal_connect(Lv41RadioButton[eCh], "toggled", G_CALLBACK(handler_level), &eCh1);
-    g_signal_connect(Lv50RadioButton[eCh], "toggled", G_CALLBACK(handler_level), &eCh1);
-    g_signal_connect(Lv51RadioButton[eCh], "toggled", G_CALLBACK(handler_level), &eCh1);
+    g_signal_connect(Lv40RadioButton[eCh], "toggled", G_CALLBACK(handler_level), pCh);
+    g_signal_connect(Lv41RadioButton[eCh], "toggled", G_CALLBACK(handler_level), pCh);
+    g_signal_connect(Lv50RadioButton[eCh], "toggled", G_CALLBACK(handler_level), pCh);
+    g_signal_connect(Lv51RadioButton[eCh], "toggled", G_CALLBACK(handler_level), pCh);
     
     LvBox[eCh] = gtk_box_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(LvBox[eCh]), Lv40RadioButton[eCh], FALSE, FALSE, 0);
@@ -243,8 +260,8 @@ static void draw_tier(API_HVC_CHN_E *pCh)
     gtk_box_pack_start(GTK_BOX(TierBox[eCh]), TierHighRadioButton[eCh], FALSE, FALSE, 0);
     
     // connect to signal
-    g_signal_connect(TierMainRadioButton[eCh], "toggled", G_CALLBACK(handler_tier), &eCh1);
-    g_signal_connect(TierHighRadioButton[eCh], "toggled", G_CALLBACK(handler_tier), &eCh1);
+    g_signal_connect(TierMainRadioButton[eCh], "toggled", G_CALLBACK(handler_tier), pCh);
+    g_signal_connect(TierHighRadioButton[eCh], "toggled", G_CALLBACK(handler_tier), pCh);
 
     // Attatch tier
     gtk_grid_attach
@@ -298,7 +315,7 @@ static void draw_res(API_HVC_CHN_E *pCh)
     gtk_combo_box_set_active(GTK_COMBO_BOX(ResCombo[eCh]), 0);
     
     // connect to signal    
-    g_signal_connect(ResCombo[eCh], "changed", G_CALLBACK(handler_res), &eCh1);
+    g_signal_connect(ResCombo[eCh], "changed", G_CALLBACK(handler_res), pCh);
 
     // Attatch resolution
     gtk_grid_attach
@@ -361,7 +378,7 @@ static void draw_framerate(API_HVC_CHN_E *pCh)
     
     gtk_combo_box_set_active(GTK_COMBO_BOX(FpsCombo[eCh]), 0);
     
-    g_signal_connect(FpsCombo[eCh], "changed" , G_CALLBACK(handler_framerate), &eCh1);
+    g_signal_connect(FpsCombo[eCh], "changed" , G_CALLBACK(handler_framerate), pCh);
     
     // Attatch framerate
     gtk_grid_attach
@@ -413,8 +430,8 @@ static void draw_bitdepth(API_HVC_CHN_E *pCh)
     Bitdepth10RadioButton[eCh] = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Bitdepth8RadioButton[eCh]), "10");
     
     // connect to signal
-    g_signal_connect(Bitdepth8RadioButton[eCh],  "toggled", G_CALLBACK(handler_bitdepth), &eCh1);
-    g_signal_connect(Bitdepth10RadioButton[eCh], "toggled", G_CALLBACK(handler_bitdepth), &eCh1);
+    g_signal_connect(Bitdepth8RadioButton[eCh],  "toggled", G_CALLBACK(handler_bitdepth), pCh);
+    g_signal_connect(Bitdepth10RadioButton[eCh], "toggled", G_CALLBACK(handler_bitdepth), pCh);
     
     BitdepthBox[eCh] = gtk_box_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(BitdepthBox[eCh]), Bitdepth8RadioButton[eCh], FALSE, FALSE, 0);
@@ -446,8 +463,8 @@ static void draw_chroma(API_HVC_CHN_E *pCh)
     Chroma422RadioButton[eCh] = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Chroma420RadioButton[eCh]), "422");
     
     // connect to signal
-    g_signal_connect(Chroma420RadioButton[eCh], "toggled", G_CALLBACK(handler_chroma), &eCh1);
-    g_signal_connect(Chroma420RadioButton[eCh], "toggled", G_CALLBACK(handler_chroma), &eCh1);
+    g_signal_connect(Chroma420RadioButton[eCh], "toggled", G_CALLBACK(handler_chroma), pCh);
+    g_signal_connect(Chroma420RadioButton[eCh], "toggled", G_CALLBACK(handler_chroma), pCh);
     
     ChromaBox[eCh] = gtk_box_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(ChromaBox[eCh]), Chroma420RadioButton[eCh], FALSE, FALSE, 0);
@@ -479,8 +496,8 @@ static void draw_pixfmt(API_HVC_CHN_E *pCh)
     PixFmt420PRadioButton[eCh] = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(PixFmtNV12RadioButton[eCh]), "420P");
     
     // connect to signal
-    g_signal_connect(PixFmtNV12RadioButton[eCh], "toggled", G_CALLBACK(handler_pixfmt), &eCh1);
-    g_signal_connect(PixFmt420PRadioButton[eCh], "toggled", G_CALLBACK(handler_pixfmt), &eCh1);
+    g_signal_connect(PixFmtNV12RadioButton[eCh], "toggled", G_CALLBACK(handler_pixfmt), pCh);
+    g_signal_connect(PixFmt420PRadioButton[eCh], "toggled", G_CALLBACK(handler_pixfmt), pCh);
     
     PixFmtBox[eCh] = gtk_box_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX(PixFmtBox[eCh]), PixFmtNV12RadioButton[eCh], FALSE, FALSE, 0);
@@ -507,62 +524,61 @@ static void draw_gop(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // GOP field
-    GopLabel = gtk_label_new("GOP: ");
-    GopIbRadioButton    = gtk_radio_button_new_with_label(NULL, "IB");
-    GopIpRadioButton    = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(GopIbRadioButton), "IP");
-    GopIpbRadioButton   = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(GopIbRadioButton), "IPB");
-    GopIRadioButton     = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(GopIbRadioButton), "I");
+    GopLabel[eCh] = gtk_label_new("GOP: ");
+    GopIbRadioButton[eCh]   = gtk_radio_button_new_with_label(NULL, "IB");
+    GopIpRadioButton[eCh]   = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(GopIbRadioButton[eCh]), "IP");
+    GopIpbRadioButton[eCh]  = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(GopIbRadioButton[eCh]), "IPB");
+    GopIRadioButton[eCh]    = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(GopIbRadioButton[eCh]), "I");
     
     // connect to signal
-    g_signal_connect(GopIbRadioButton,  "toggled", G_CALLBACK(handler_gop), &eCh1);
-    g_signal_connect(GopIpRadioButton,  "toggled", G_CALLBACK(handler_gop), &eCh1);
-    g_signal_connect(GopIpbRadioButton, "toggled", G_CALLBACK(handler_gop), &eCh1);
-    g_signal_connect(GopIRadioButton,   "toggled", G_CALLBACK(handler_gop), &eCh1);
+    g_signal_connect(GopIbRadioButton[eCh],  "toggled", G_CALLBACK(handler_gop), pCh);
+    g_signal_connect(GopIpRadioButton[eCh],  "toggled", G_CALLBACK(handler_gop), pCh);
+    g_signal_connect(GopIpbRadioButton[eCh], "toggled", G_CALLBACK(handler_gop), pCh);
+    g_signal_connect(GopIRadioButton[eCh],   "toggled", G_CALLBACK(handler_gop), pCh);
     
-    GopBox = gtk_box_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(GopBox), GopIbRadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(GopBox), GopIpRadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(GopBox), GopIpbRadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(GopBox), GopIRadioButton,  FALSE, FALSE, 0);
+    GopBox[eCh] = gtk_box_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(GopBox[eCh]), GopIbRadioButton[eCh], FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GopBox[eCh]), GopIpRadioButton[eCh], FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GopBox[eCh]), GopIpbRadioButton[eCh], FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GopBox[eCh]), GopIRadioButton[eCh],  FALSE, FALSE, 0);
     
     // Attatch GOP
     gtk_grid_attach
     (
         GridCh[eCh],
-        GopLabel,
+        GopLabel[eCh],
         0, GRID_ORDER_GOP, 1, 1
     );    
 
     gtk_grid_attach
     (
         GridCh[eCh],
-        GopBox,
+        GopBox[eCh],
         1, GRID_ORDER_GOP, 1, 1
     ); 
 }
-
 
 static void draw_gop_size(API_HVC_CHN_E *pCh)
 {
     API_HVC_CHN_E eCh = *pCh;
 
-    GopSizeLabel = gtk_label_new("GOP Size: ");
-    GopSizeEntry = gtk_entry_new();
+    GopSizeLabel[eCh] = gtk_label_new("GOP Size: ");
+    GopSizeEntry[eCh] = gtk_entry_new();
 
-    gtk_entry_set_text(GTK_ENTRY(GopSizeEntry), "64");
+    gtk_entry_set_text(GTK_ENTRY(GopSizeEntry[eCh]), "64");
 
     // Attatch GOP size
     gtk_grid_attach
     (
         GridCh[eCh],
-        GopSizeLabel,
+        GopSizeLabel[eCh],
         0, GRID_ORDER_GOP_SIZE, 1, 1
     );
     
     gtk_grid_attach
     (
         GridCh[eCh],
-        GopSizeEntry,
+        GopSizeEntry[eCh],
         1, GRID_ORDER_GOP_SIZE, 1, 1
     );     
 }
@@ -571,23 +587,23 @@ static void draw_idr_interval(API_HVC_CHN_E *pCh)
 {
     API_HVC_CHN_E eCh = *pCh;
 
-    IdrIntervalLabel = gtk_label_new("IDR Interval: ");
-    IdrIntervalEntry = gtk_entry_new();
+    IdrIntervalLabel[eCh] = gtk_label_new("IDR Interval: ");
+    IdrIntervalEntry[eCh] = gtk_entry_new();
 
-    gtk_entry_set_text(GTK_ENTRY(IdrIntervalEntry), "0");
+    gtk_entry_set_text(GTK_ENTRY(IdrIntervalEntry[eCh]), "0");
 
     // Attatch GOP size
     gtk_grid_attach
     (
         GridCh[eCh],
-        IdrIntervalLabel,
+        IdrIntervalLabel[eCh],
         0, GRID_ORDER_IDR_INTERVAL, 1, 1
     );
-    
+
     gtk_grid_attach
     (
         GridCh[eCh],
-        IdrIntervalEntry,
+        IdrIntervalEntry[eCh],
         1, GRID_ORDER_IDR_INTERVAL, 1, 1
     );     
 }
@@ -597,593 +613,31 @@ static void draw_b_frame_num(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // Ref frame number
-    BNumLabel = gtk_label_new("B frame #: ");
-    BNumScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 1.0, 8.0, 1.0);
+    BNumLabel[eCh] = gtk_label_new("B frame #: ");
+    BNumScale[eCh] = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 1.0, 8.0, 1.0);
     
     // Attatch ref
     gtk_grid_attach
     (
         GridCh[eCh],
-        BNumLabel,
+        BNumLabel[eCh],
         0, GRID_ORDER_BNUM, 1, 1
     );
     
     gtk_grid_attach
     (
         GridCh[eCh],
-        BNumScale,
+        BNumScale[eCh],
         1, GRID_ORDER_BNUM, 1, 1
     ); 
 }
 
-static size_t calculate_vraw_enqueue_data_size(API_HVC_INIT_PARAM_T *p_init_param)
+static void draw_run(API_HVC_CHN_E eCh)
 {
-    uint32_t hsize_va;
-    uint32_t vsize_va;
-    uint32_t bit_depth;
-    uint32_t y_data_size;
-    uint32_t c_data_size;
-    uint8_t c_pixel_per_sample;
-    
-    // set bit-depth factor
-    switch (p_init_param->eBitDepth)
-    {
-        case API_HVC_BIT_DEPTH_8:
-        {
-            bit_depth = 8;
-            break;
-        }
-        case API_HVC_BIT_DEPTH_10:
-        {
-            bit_depth = 10;
-            break;
-        }
-
-        default:
-        {
-            bit_depth = 8;
-            break;
-        }
-    }
-
-    // set chrom factor
-    switch (p_init_param->eChromaFmt)
-    {
-        case API_HVC_CHROMA_FORMAT_420:
-        {
-            c_pixel_per_sample = 4;
-            break;
-        }
-        case API_HVC_CHROMA_FORMAT_422:
-        {
-            c_pixel_per_sample = 2;
-            break;
-        }
-        default:
-        {
-            c_pixel_per_sample = 4;
-            break;
-        }
-    }
-
-    switch (p_init_param->eResolution)
-    {
-        case API_HVC_RESOLUTION_720x480:
-        {
-            hsize_va = 720;
-            vsize_va = 480;
-            break;
-        }
-        case API_HVC_RESOLUTION_720x576:
-        {
-            hsize_va = 720;
-            vsize_va = 576;
-            break;
-        }
-        case API_HVC_RESOLUTION_1280x720:
-        {
-            hsize_va = 1280;
-            vsize_va = 720;
-            break;
-        }
-        case API_HVC_RESOLUTION_1920x1080:
-        {
-            hsize_va = 1920;
-            vsize_va = 1080;
-            break;
-        }
-        case API_HVC_RESOLUTION_3840x2160:
-        {
-            hsize_va = 3840;
-            vsize_va = 2160;
-            break;
-        }
-        default:
-        {
-            hsize_va = 3840;
-            vsize_va = 2160;            
-            break;
-        }
-    }
-
-    y_data_size = ( ( hsize_va * vsize_va ) * bit_depth ) / 8;
-
-    c_data_size = y_data_size / c_pixel_per_sample;
-
-    return y_data_size + c_data_size + c_data_size;
-}
-
-
-void make_timestamp(char * timestamp_p, size_t size)
-{
-	time_t now;
-	struct tm *now_tm_p;
-
-	now = time ( NULL );
-
-	now_tm_p = localtime ( &now );
-
-	strftime ( timestamp_p, size, FMB_TIMESTAMP_FORMAT, now_tm_p );
-}
-
-
-static void make_output_file_name
-(
-    const char *timestamp, char *es_file_name_p, size_t length
-)
-{
-    int result;
-
-    result = snprintf( es_file_name_p, ( length - 1 ), FMB_ES_FILE_NAME_FORMAT, timestamp);
-}
-
-
-static void ui_process_coded_frame(API_HVC_HEVC_CODED_PICT_T *p_coded_pict, void *args)
-{
-    POP_ES_CALLBACK_PARAM_T *p_callback_param;
-    API_HVC_BOARD_E eBoard;
-    API_HVC_CHN_E eCh;
-
-    p_callback_param = (POP_ES_CALLBACK_PARAM_T *) args;
-
-    eBoard = p_callback_param->board_num;
-    eCh = p_callback_param->channel;
-    
-    char msg[512];
-    char *p;
-
-    p = msg;
-
-    p += sprintf(p, "%s: board=%d, ch=%d, pts=%lu, type=%d ",
-        __FUNCTION__,
-        eBoard, eCh,
-        p_coded_pict->pts,
-        p_coded_pict->eFrameType);
-        
-    uint32_t i;
-    for (i = 0; i < p_coded_pict->u32NalNum; i++)
-    {
-        p += sprintf(p, "[NAL%u len=%u, type=%u]", 
-                        i,
-                        p_coded_pict->tNalInfo[i].u32Length,
-                        p_coded_pict->tNalInfo[i].eNalType);
-  
-        if (fd_w[eCh])
-        {
-            write(fd_w[eCh], p_coded_pict->tNalInfo[i].pu8Addr, p_coded_pict->tNalInfo[i].u32Length);
-        }
-    }
-    LOG("%s\n", msg);
-
-    p_callback_param->poped_frame++;
-
-    gdouble fraction;
-
-    fraction = (double) p_callback_param->poped_frame / (double) p_callback_param->total_frame;
-
-    //LOG("%f %d %d\n", fraction, poped_frame, total_frame);
-
-    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ProgressBar[eCh]), fraction);
-}
-
-
-static void *encode_thr_fn(void *data)
-{
-    ENCODE_CALLBACK_PARAM_T *param = (ENCODE_CALLBACK_PARAM_T *) data;
-    API_HVC_CHN_E eCh = param->eCh;
-    char *str_profile = (tApiHvcInitParam[eCh].eProfile == API_HVC_HEVC_MAIN_PROFILE) ? "Main" : "Main10";
-    
-    LOG("Profile: %s\n", str_profile);
-    
-    char *str_level;
-    
-    struct timeval tv1, tv2, res;
-    
-    switch (tApiHvcInitParam[eCh].eLevel)
-    {
-        case API_HVC_HEVC_LEVEL_40:
-        {
-            str_level = "L4.0";
-            break;
-        }       
-        case API_HVC_HEVC_LEVEL_41:
-        {
-            str_level = "L4.1";
-            break;
-        }        
-        case API_HVC_HEVC_LEVEL_50:
-        {
-            str_level = "L5.0";
-            break;
-        }        
-        case API_HVC_HEVC_LEVEL_51:
-        {
-            str_level = "L5.1";
-            break;
-        }        
-        default:
-        {
-            break;
-        }
-    }
-    
-    LOG("Level: %s\n", str_level);
-
-    
-    char *str_tier = (tApiHvcInitParam[eCh].eTier == API_HVC_HEVC_MAIN_TIER) ? "Main Tier" : "High Tier";
-    
-    LOG("Tier: %s\n", str_tier);
-    
-
-    char *str_res = "Unknown";
-    
-    switch (tApiHvcInitParam[eCh].eResolution)
-    {
-        case API_HVC_RESOLUTION_3840x2160:
-        {
-            str_res = "3840x2160";
-
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
-            
-            break;
-        }        
-        case API_HVC_RESOLUTION_1920x1080:
-        {
-            str_res = "1920x1080";
-
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 8;
-            
-            break;
-        }        
-        case API_HVC_RESOLUTION_1280x720:
-        {
-            str_res = "1280x720";
-
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
-            
-            break;
-        }        
-        case API_HVC_RESOLUTION_720x576:
-        {
-            str_res = "720x576";
-            
-            tApiHvcInitParam[eCh].eAspectRatioIdc = API_HVC_HEVC_ASPECT_RATIO_IDC_4;
-
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
-            
-            break;
-        }   
-        case API_HVC_RESOLUTION_720x480:
-        {
-            str_res = "720x480";
-
-            tApiHvcInitParam[eCh].eAspectRatioIdc = API_HVC_HEVC_ASPECT_RATIO_IDC_5;
-            
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
-            
-            break;
-        }  
-        default:
-        {
-            break;
-        }
-    }
-    
-    LOG("Resolution: %s\n", str_res);
-
-    char *str_framerate = "Unknown";
-    
-    switch (tApiHvcInitParam[eCh].eTargetFrameRate)
-    {
-        case API_HVC_FPS_24:
-        {
-            str_framerate = "24p";
-            break;
-        }        
-        case API_HVC_FPS_25:
-        {
-            str_framerate = "25p";
-            break;
-        } 
-        case API_HVC_FPS_29_97:
-        {
-            str_framerate = "29.97p";
-            break;
-        } 
-        case API_HVC_FPS_30:
-        {
-            str_framerate = "30p";
-            break;
-        }
-        case API_HVC_FPS_50:
-        {
-            str_framerate = "50p";
-            break;
-        }        
-        case API_HVC_FPS_59_94:
-        {
-            str_framerate = "59.94p";
-            break;
-        }
-        case API_HVC_FPS_60:
-        {
-            str_framerate = "60p";
-            break;
-        }        
-        default:
-        {
-            break;
-        }
-    }
-    
-    LOG("Framerate: %s\n", str_framerate);
-    
-    
-    guint bitrate_val;
-
-    bitrate_val = gtk_range_get_value(GTK_RANGE(Bitrate[eCh]));
-    
-    LOG("Bitrate %d kbps\n", bitrate_val);
-    
-    tApiHvcInitParam[eCh].u32Bitrate = bitrate_val;
-
-
-    char *str_bitdepth = "Unknown";
-    
-    switch (tApiHvcInitParam[eCh].eBitDepth)
-    {
-        case API_HVC_BIT_DEPTH_8:
-        {
-            str_bitdepth = "8";
-            break;
-        }        
-        case API_HVC_BIT_DEPTH_10:
-        {
-            str_bitdepth = "10";
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-    
-    LOG("bit depth: %s\n", str_bitdepth);
-    
-    
-    char *str_chroma = (tApiHvcInitParam[eCh].eChromaFmt == API_HVC_CHROMA_FORMAT_420) ? "420" : "422";
-    
-    LOG("Chroma: %s\n", str_chroma);
-
-    
-    char *str_gop = "Unknown";
-
-    switch (tApiHvcInitParam[eCh].eGopType)
-    {
-        case API_HVC_GOP_I:
-        {
-            str_gop = "I";
-            break;
-        }
-        case API_HVC_GOP_IP:
-        {
-            str_gop = "IP";
-            break;
-        }
-        case API_HVC_GOP_IB:
-        {
-            str_gop = "IB";
-            break;
-        }
-        case API_HVC_GOP_IPB:
-        {
-            str_gop = "IPB";
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-    
-    LOG("GOP: %s\n", str_gop);
-
-    if (tApiHvcInitParam[eCh].eGopType != API_HVC_GOP_I)
-    {
-        tApiHvcInitParam[eCh].eGopSize = atoi(gtk_entry_get_text( GTK_ENTRY(GopSizeEntry) ));
-    }
-
-    LOG("GOP size=%d\n", tApiHvcInitParam[eCh].eGopSize);
-
-    if (tApiHvcInitParam[eCh].eGopType != API_HVC_GOP_I)
-    {
-        tApiHvcInitParam[eCh].eIDRFrameNum = atoi(gtk_entry_get_text( GTK_ENTRY(IdrIntervalEntry) ));
-    }
-
-    LOG("IDR interval=%d\n", tApiHvcInitParam[eCh].eIDRFrameNum);
-    
-
-    if ((tApiHvcInitParam[eCh].eGopType == API_HVC_GOP_IB)
-       || (tApiHvcInitParam[eCh].eGopType == API_HVC_GOP_IPB))
-    {
-        guint refnum;
-    
-        refnum = gtk_range_get_value( GTK_RANGE(BNumScale) );
-        
-        tApiHvcInitParam[eCh].eBFrameNum = (API_HVC_B_FRAME_NUM_E) refnum;
-
-        LOG("B ref#=%u\n", refnum);
-    }
-
-    tApiHvcInitParam[eCh].tCoding.bDisableAMP = true;
-    
-
-    API_HVC_BOARD_E eBoard = API_HVC_BOARD_1;
-
-    eCh = param->eCh;
-    
-    gettimeofday(&tv1, NULL);
-    if (HVC_ENC_Init(eBoard, eCh, &tApiHvcInitParam[eCh]))
-    {
-        sprintf(err_msg, "%s line %d failed!", __FILE__, __LINE__);
-            
-        goto callback_encode_ret;
-    }  
-    LOG("HVC_ENC_Init success!\n");
-
-
-    tPopEsArgs[eBoard][eCh].board_num = eBoard;
-    tPopEsArgs[eBoard][eCh].channel   = eCh;
-    if (
-        HVC_ENC_RegisterCallback
-        (
-            eBoard,
-            eCh,
-            ui_process_coded_frame,
-            (void *) &tPopEsArgs[eBoard][eCh]
-        )
-       )
-    {
-        sprintf(err_msg, "%s line %d failed!", __FILE__, __LINE__);
-
-        goto callback_encode_ret;
-    }
-
-
-    if (HVC_ENC_Start(eBoard, eCh))
-    {
-        sprintf(err_msg, "%s line %d failed!", __FILE__, __LINE__);
-
-        goto callback_encode_ret;
-    }
-
-    LOG("HVC_ENC_Start success!\n");
-
-    char es_file_name[FILENAME_MAX];
-    char timestamp[15];
-
-    make_timestamp(timestamp, sizeof(timestamp));
-    make_output_file_name(timestamp, es_file_name, FILENAME_MAX);
-
-    fd_r[eCh]  = open(FilenameRawYUV[eCh], O_RDONLY);
-    fd_w[eCh]   = open(es_file_name, 
-                    O_WRONLY | O_CREAT,
-                    S_IRWXU);
-                 
-    uint8_t *vraw_data_buf_p = NULL;
-    uint32_t frame_sz = 0;
-    struct stat file_stat;
-    int remain_frame = 0;
-
-    fstat(fd_r[eCh], &file_stat);
-
-    frame_sz = calculate_vraw_enqueue_data_size(&tApiHvcInitParam[eCh]);
-    remain_frame = ((uint64_t) file_stat.st_size / frame_sz);
-    tPopEsArgs[eBoard][eCh].total_frame = remain_frame;
-    tPopEsArgs[eBoard][eCh].poped_frame = 0;
-    
-    vraw_data_buf_p = malloc(frame_sz);;
-
-    while (remain_frame > 0)
-    {        
-        read(fd_r[eCh], vraw_data_buf_p, frame_sz);
-
-        remain_frame--;
-
-        img.pu8Addr     = vraw_data_buf_p;
-        img.u32Size     = frame_sz;
-        img.pts         = GET_PTS_IN_MS(eCh, tPopEsArgs[eBoard][eCh].total_frame - remain_frame);
-        img.bLastFrame  = (remain_frame == 0) ? true : false;
-
-        if (HVC_ENC_PushImage(eBoard, eCh, &img))
-        {
-            sprintf(err_msg, "Error: %s PushImage failed!\n", __FILE__);
-
-            goto callback_encode_ret;
-        }
-    }
-
-    LOG("Encode done...\n");
-
-    // try stop
-    while (HVC_ENC_Stop(eBoard, eCh))
-    {
-        sleep(1);
-    }
-    LOG("\n stop complete!\n");
-
-    if (HVC_ENC_Exit(eBoard, eCh))
-    {
-        LOG(err_msg, "%s line %d failed!", __FILE__, __LINE__);
-
-        goto callback_encode_ret;
-    }
-    LOG("\n Encoder exit!\n");
-    gettimeofday(&tv2, NULL);
-    timersub(&tv2, &tv1, &res);
-    LOG("%lu sec %lu usec\n", res.tv_sec, res.tv_usec); 
-    
-    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ProgressBar[eCh]), 0.0);
-
-    close(fd_w[eCh]);
-
-callback_encode_ret:
-    LOG("%s\n", err_msg);
-}
-
-static void callback_encode(GtkWidget *button, ENCODE_CALLBACK_PARAM_T *param)
-{
-    pthread_t tid;
-    pthread_create
-    (
-        &tid,
-        NULL,
-        encode_thr_fn,
-        param
-    );
-}
-
-static void draw_encode(API_HVC_CHN_E eCh)
-{
-    EncodeButton[eCh] = gtk_button_new_with_label("Encode");
+    EncodeButton[eCh] = gtk_button_new_with_label("Run");
 
     tEncodeParam[eCh].eCh = eCh;
-    g_signal_connect(EncodeButton[eCh], "clicked", G_CALLBACK(callback_encode), &tEncodeParam[eCh]);
+    g_signal_connect(EncodeButton[eCh], "clicked", G_CALLBACK(handler_run), &tEncodeParam[eCh]);
 
     // Attach encode
     gtk_grid_attach
@@ -1194,31 +648,6 @@ static void draw_encode(API_HVC_CHN_E eCh)
     );
 }
 
-static void callback_open(GtkWidget *button, OPEN_CALLBACK_PARAM_T *param)    
-{
-    GtkWidget *dialog;
-
-    dialog = gtk_file_chooser_dialog_new
-            (
-                "Select raw image ...",
-                GTK_WINDOW(param->window),
-                GTK_FILE_CHOOSER_ACTION_SAVE,
-                "_Cancel", GTK_RESPONSE_CANCEL,
-                "_Open", GTK_RESPONSE_ACCEPT,
-                NULL
-            );
-    gint result = gtk_dialog_run(GTK_DIALOG (dialog));
-
-    if (result == GTK_RESPONSE_ACCEPT)
-    {
-        FilenameRawYUV[param->eCh] = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-
-        gtk_button_set_label(GTK_BUTTON(button), FilenameRawYUV[param->eCh]);
-    }
-
-    gtk_widget_destroy(dialog);
-}
-
 static void draw_open(GtkWidget *window, API_HVC_CHN_E eCh)
 {
     OpenButton[eCh] = gtk_button_new_with_label("Open ...");
@@ -1226,7 +655,7 @@ static void draw_open(GtkWidget *window, API_HVC_CHN_E eCh)
     tOpenParam[eCh].eCh = eCh;
     tOpenParam[eCh].window = window;
 
-    g_signal_connect(OpenButton[eCh], "clicked", G_CALLBACK(callback_open), &tOpenParam[eCh]);
+    g_signal_connect(OpenButton[eCh], "clicked", G_CALLBACK(handler_open), &tOpenParam[eCh]);
 
     // Attach open
     gtk_grid_attach
@@ -1259,9 +688,10 @@ int main(int argc, char *argv[])
  
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-    gtk_window_set_title(GTK_WINDOW (window), "HVC-8700");
-    gtk_container_set_border_width(GTK_CONTAINER (window), 10);
+    gtk_window_set_title(GTK_WINDOW(window), "HVC-8700");
+    gtk_container_set_border_width(GTK_CONTAINER(window), 10);
     gtk_widget_set_size_request(window, 150, 100);
+    //g_signal_connect(GTK_WINDOW(window), "delete_event", G_CALLBACK(gtk_window_close), NULL);
 
     notebook = GTK_NOTEBOOK(gtk_notebook_new());
 
@@ -1287,14 +717,28 @@ int main(int argc, char *argv[])
     draw_idr_interval(&eCh1);
     draw_b_frame_num(&eCh1);
 
-    draw_encode(eCh1);
+    draw_run(eCh1);
     draw_open(window, eCh1);
     draw_bar(eCh1);
 
-
     // Create Channel 2 panel
     draw_profile(&eCh2);
+    draw_level(&eCh2);
+    draw_tier(&eCh2);
+    draw_res(&eCh2);
+    draw_framerate(&eCh2);
+    draw_bitrate(&eCh2);
+    draw_bitdepth(&eCh2);
+    draw_chroma(&eCh2);
+    draw_pixfmt(&eCh2);
+    draw_gop(&eCh2);
+    draw_gop_size(&eCh2);
+    draw_idr_interval(&eCh2);
+    draw_b_frame_num(&eCh2);
 
+    draw_run(eCh2);
+    draw_open(window, eCh2);
+    draw_bar(eCh2);
 
     /* Append to pages to the notebook container. */
     gtk_notebook_append_page(notebook, GTK_WIDGET(GridCh[eCh1]), Label1);
