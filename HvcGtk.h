@@ -78,11 +78,11 @@ extern GtkComboBoxText *ResCombo[API_HVC_CHN_MAX];
 
 extern GtkComboBoxText *FpsCombo[API_HVC_CHN_MAX];
 
-extern GtkWidget *Bitdepth8RadioButton;
+extern GtkWidget *Bitdepth8RadioButton[API_HVC_CHN_MAX];
 
-extern GtkWidget *Chroma420RadioButton;
+extern GtkWidget *Chroma420RadioButton[API_HVC_CHN_MAX];
 
-extern GtkWidget *PixFmtNV12RadioButton;
+extern GtkWidget *PixFmtNV12RadioButton[API_HVC_CHN_MAX];
 
 extern GtkWidget *GopIbRadioButton;
 

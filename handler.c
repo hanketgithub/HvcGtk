@@ -28,7 +28,7 @@ void handler_profile(GtkWidget *widget, gpointer *data)
         }
     }
     
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
+    const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
     if (strcmp(val, "Main") == 0)
     {
@@ -61,7 +61,7 @@ void handler_level(GtkWidget *widget, gpointer *data)
         }
     }
     
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
+    const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
     if (strcmp(val, "4.0") == 0)
     {
@@ -102,7 +102,7 @@ void handler_tier(GtkWidget *widget, gpointer *data)
         }
     }
     
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
+    const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
     if (strcmp(val, "Main") == 0)
     {
@@ -121,7 +121,7 @@ void handler_res(GtkWidget *widget, gpointer *data)
     gchar *val = NULL;
     API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
     
-    val = gtk_combo_box_text_get_active_text(ResCombo);
+    val = gtk_combo_box_text_get_active_text(ResCombo[eCh]);
 
     if (strcmp(val, "3840x2160") == 0)
     {
@@ -153,7 +153,7 @@ void handler_framerate(GtkWidget *widget, gpointer *data)
     gchar *val = NULL;
     API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
 
-    val = gtk_combo_box_text_get_active_text(FramerateCombo);
+    val = gtk_combo_box_text_get_active_text(FpsCombo[eCh]);
     
     if (strcmp(val, "24") == 0)
     {
@@ -193,7 +193,7 @@ void handler_bitdepth(GtkWidget *widget, gpointer *data)
     GtkToggleButton *button = NULL;
     API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
     
-    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(Bitdepth8RadioButton));
+    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(Bitdepth8RadioButton[eCh]));
     
     while (list) // As long as we didn't reach the end of the group.
     {
@@ -206,7 +206,7 @@ void handler_bitdepth(GtkWidget *widget, gpointer *data)
         }
     }
     
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
+    const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
     if (strcmp(val, "8") == 0)
     {
@@ -226,7 +226,7 @@ void handler_chroma(GtkWidget *widget, gpointer *data)
     GtkToggleButton *button = NULL;
     API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
     
-    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(Chroma420RadioButton));
+    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(Chroma420RadioButton[eCh]));
     
     while (list) // As long as we didn't reach the end of the group.
     {
@@ -239,7 +239,7 @@ void handler_chroma(GtkWidget *widget, gpointer *data)
         }
     }
     
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
+    const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
     if (strcmp(val, "420") == 0)
     {
@@ -259,7 +259,7 @@ void handler_pixfmt(GtkWidget *widget, gpointer *data)
     GtkToggleButton *button = NULL;
     API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
     
-    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(PixFmtNV12RadioButton));
+    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(PixFmtNV12RadioButton[eCh]));
     
     while (list) // As long as we didn't reach the end of the group.
     {
@@ -272,7 +272,7 @@ void handler_pixfmt(GtkWidget *widget, gpointer *data)
         }
     }
     
-    const char *val = gtk_button_get_label(GTK_BUTTON(button));
+    const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
     if (strcmp(val, "NV12") == 0)
     {

@@ -67,20 +67,20 @@ GtkComboBoxText *FpsCombo[API_HVC_CHN_MAX];
 GtkWidget *BitrateLabel[API_HVC_CHN_MAX];
 GtkWidget *Bitrate[API_HVC_CHN_MAX];
 
-GtkWidget *BitdepthLabel;
-GtkWidget *Bitdepth8RadioButton;
-GtkWidget *Bitdepth10RadioButton;
-GtkWidget *BitdepthBox;
+GtkWidget *BitdepthLabel[API_HVC_CHN_MAX];
+GtkWidget *Bitdepth8RadioButton[API_HVC_CHN_MAX];
+GtkWidget *Bitdepth10RadioButton[API_HVC_CHN_MAX];
+GtkWidget *BitdepthBox[API_HVC_CHN_MAX];
 
-GtkWidget *ChromaLabel;
-GtkWidget *Chroma420RadioButton;
-GtkWidget *Chroma422RadioButton;
-GtkWidget *ChromaBox;
+GtkWidget *ChromaLabel[API_HVC_CHN_MAX];
+GtkWidget *Chroma420RadioButton[API_HVC_CHN_MAX];
+GtkWidget *Chroma422RadioButton[API_HVC_CHN_MAX];
+GtkWidget *ChromaBox[API_HVC_CHN_MAX];
 
-GtkWidget *PixFmtLabel;
-GtkWidget *PixFmtNV12RadioButton;
-GtkWidget *PixFmt420PRadioButton;
-GtkWidget *PixFmtBox;
+GtkWidget *PixFmtLabel[API_HVC_CHN_MAX];
+GtkWidget *PixFmtNV12RadioButton[API_HVC_CHN_MAX];
+GtkWidget *PixFmt420PRadioButton[API_HVC_CHN_MAX];
+GtkWidget *PixFmtBox[API_HVC_CHN_MAX];
 
 GtkWidget *GopLabel;
 GtkWidget *GopIbRadioButton;
@@ -408,31 +408,30 @@ static void draw_bitdepth(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // Bitdepth field
-    BitdepthLabel = gtk_label_new ("Bitdepth: ");
-    
-    Bitdepth8RadioButton = gtk_radio_button_new_with_label(NULL, "8");
-    Bitdepth10RadioButton = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Bitdepth8RadioButton), "10");
+    BitdepthLabel[eCh] = gtk_label_new ("Bitdepth: ");
+    Bitdepth8RadioButton[eCh] = gtk_radio_button_new_with_label(NULL, "8");
+    Bitdepth10RadioButton[eCh] = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Bitdepth8RadioButton[eCh]), "10");
     
     // connect to signal
-    g_signal_connect(Bitdepth8RadioButton,  "toggled", G_CALLBACK(handler_bitdepth), &eCh1);
-    g_signal_connect(Bitdepth10RadioButton, "toggled", G_CALLBACK(handler_bitdepth), &eCh1);
+    g_signal_connect(Bitdepth8RadioButton[eCh],  "toggled", G_CALLBACK(handler_bitdepth), &eCh1);
+    g_signal_connect(Bitdepth10RadioButton[eCh], "toggled", G_CALLBACK(handler_bitdepth), &eCh1);
     
-    BitdepthBox = gtk_box_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(BitdepthBox), Bitdepth8RadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(BitdepthBox), Bitdepth10RadioButton, FALSE, FALSE, 0);    
+    BitdepthBox[eCh] = gtk_box_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(BitdepthBox[eCh]), Bitdepth8RadioButton[eCh], FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(BitdepthBox[eCh]), Bitdepth10RadioButton[eCh], FALSE, FALSE, 0);    
 
     // Attatch bitdepth
     gtk_grid_attach
     (
         GridCh[eCh],
-        BitdepthLabel,
+        BitdepthLabel[eCh],
         0, GRID_ORDER_BITDEPTH, 1, 1
     );
     
     gtk_grid_attach
     (
         GridCh[eCh],
-        BitdepthBox,
+        BitdepthBox[eCh],
         1, GRID_ORDER_BITDEPTH, 1, 1
     );     
 }
@@ -442,30 +441,30 @@ static void draw_chroma(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // Chroma field
-    ChromaLabel = gtk_label_new("Chroma: ");
-    Chroma420RadioButton = gtk_radio_button_new_with_label(NULL, "420");
-    Chroma422RadioButton = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Chroma420RadioButton), "422");
+    ChromaLabel[eCh] = gtk_label_new("Chroma: ");
+    Chroma420RadioButton[eCh] = gtk_radio_button_new_with_label(NULL, "420");
+    Chroma422RadioButton[eCh] = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(Chroma420RadioButton[eCh]), "422");
     
     // connect to signal
-    g_signal_connect(Chroma420RadioButton, "toggled", G_CALLBACK(handler_chroma), &eCh1);
-    g_signal_connect(Chroma420RadioButton, "toggled", G_CALLBACK(handler_chroma), &eCh1);
+    g_signal_connect(Chroma420RadioButton[eCh], "toggled", G_CALLBACK(handler_chroma), &eCh1);
+    g_signal_connect(Chroma420RadioButton[eCh], "toggled", G_CALLBACK(handler_chroma), &eCh1);
     
-    ChromaBox = gtk_box_new(FALSE, 5);
-    gtk_box_pack_start( GTK_BOX(ChromaBox), Chroma420RadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start( GTK_BOX(ChromaBox), Chroma422RadioButton, FALSE, FALSE, 0);
+    ChromaBox[eCh] = gtk_box_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(ChromaBox[eCh]), Chroma420RadioButton[eCh], FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(ChromaBox[eCh]), Chroma422RadioButton[eCh], FALSE, FALSE, 0);
 
     // Attatch chroma
     gtk_grid_attach
     (
         GridCh[eCh],
-        ChromaLabel,
+        ChromaLabel[eCh],
         0, GRID_ORDER_CHROMA, 1, 1
     );
 
     gtk_grid_attach
     (
         GridCh[eCh],
-        ChromaBox,
+        ChromaBox[eCh],
         1, GRID_ORDER_CHROMA, 1, 1
     );
 }
@@ -475,30 +474,30 @@ static void draw_pixfmt(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // Pixel format field
-    PixFmtLabel = gtk_label_new("Pixel Fmt: ");
-    PixFmtNV12RadioButton = gtk_radio_button_new_with_label(NULL, "NV12");
-    PixFmt420PRadioButton = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(PixFmtNV12RadioButton), "420P");
+    PixFmtLabel[eCh] = gtk_label_new("Pixel Fmt: ");
+    PixFmtNV12RadioButton[eCh] = gtk_radio_button_new_with_label(NULL, "NV12");
+    PixFmt420PRadioButton[eCh] = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(PixFmtNV12RadioButton[eCh]), "420P");
     
     // connect to signal
-    g_signal_connect(PixFmtNV12RadioButton, "toggled", G_CALLBACK(handler_pixfmt), &eCh1);
-    g_signal_connect(PixFmt420PRadioButton, "toggled", G_CALLBACK(handler_pixfmt), &eCh1);
+    g_signal_connect(PixFmtNV12RadioButton[eCh], "toggled", G_CALLBACK(handler_pixfmt), &eCh1);
+    g_signal_connect(PixFmt420PRadioButton[eCh], "toggled", G_CALLBACK(handler_pixfmt), &eCh1);
     
-    PixFmtBox = gtk_box_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(PixFmtBox), PixFmtNV12RadioButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(PixFmtBox), PixFmt420PRadioButton, FALSE, FALSE, 0);
+    PixFmtBox[eCh] = gtk_box_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(PixFmtBox[eCh]), PixFmtNV12RadioButton[eCh], FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(PixFmtBox[eCh]), PixFmt420PRadioButton[eCh], FALSE, FALSE, 0);
 
     // Attatch chroma
     gtk_grid_attach
     (
         GridCh[eCh],
-        PixFmtLabel,
+        PixFmtLabel[eCh],
         0, GRID_ORDER_PIX_FMT, 1, 1
     );
 
     gtk_grid_attach
     (
         GridCh[eCh],
-        PixFmtBox,
+        PixFmtBox[eCh],
         1, GRID_ORDER_PIX_FMT, 1, 1
     );
 }
