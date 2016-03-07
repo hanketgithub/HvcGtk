@@ -58,8 +58,14 @@ GtkWidget *TierMainRadioButton[API_HVC_CHN_MAX];
 GtkWidget *TierHighRadioButton[API_HVC_CHN_MAX];
 GtkWidget *TierBox[API_HVC_CHN_MAX];
 
-GtkWidget *ResLabel;
-GtkComboBoxText *ResCombo;
+GtkWidget *ResLabel[API_HVC_CHN_MAX];
+GtkComboBoxText *ResCombo[API_HVC_CHN_MAX];
+
+GtkWidget *FpsLabel[API_HVC_CHN_MAX];
+GtkComboBoxText *FpsCombo[API_HVC_CHN_MAX];
+
+GtkWidget *BitrateLabel[API_HVC_CHN_MAX];
+GtkWidget *Bitrate[API_HVC_CHN_MAX];
 
 GtkWidget *BitdepthLabel;
 GtkWidget *Bitdepth8RadioButton;
@@ -92,11 +98,6 @@ GtkWidget *IdrIntervalEntry;
 GtkWidget *BNumLabel;
 GtkWidget *BNumScale;
 
-GtkWidget *FramerateLabel;
-GtkComboBoxText *FramerateCombo;
-
-GtkWidget *BitrateLabel;
-GtkWidget *Bitrate;
 
 GtkWidget *OpenButton[API_HVC_CHN_MAX];
 GtkWidget *EncodeButton[API_HVC_CHN_MAX];
@@ -266,51 +267,51 @@ static void draw_res(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // Resolution field
-    ResLabel = gtk_label_new("Resolution: ");
-    ResCombo = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
+    ResLabel[eCh] = gtk_label_new("Resolution: ");
+    ResCombo[eCh] = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
     
     gtk_combo_box_text_append_text
     (
-        ResCombo,
+        ResCombo[eCh],
         "3840x2160"
     );
     gtk_combo_box_text_append_text
     (
-        ResCombo,
+        ResCombo[eCh],
         "1920x1080"
     );
     gtk_combo_box_text_append_text
     (
-        ResCombo,
+        ResCombo[eCh],
         "1280x720"
     );    
     gtk_combo_box_text_append_text
     (
-        ResCombo,
+        ResCombo[eCh],
         "720x576"
     );   
     gtk_combo_box_text_append_text
     (
-        ResCombo,
+        ResCombo[eCh],
         "720x480"
     );  
-    gtk_combo_box_set_active(GTK_COMBO_BOX(ResCombo), 0);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(ResCombo[eCh]), 0);
     
     // connect to signal    
-    g_signal_connect(ResCombo, "changed", G_CALLBACK(handler_res), &eCh1);
+    g_signal_connect(ResCombo[eCh], "changed", G_CALLBACK(handler_res), &eCh1);
 
     // Attatch resolution
     gtk_grid_attach
     (
         GridCh[eCh],
-        ResLabel,
+        ResLabel[eCh],
         0, GRID_ORDER_RESOLUTION, 1, 1
     );
     
     gtk_grid_attach
     (
         GridCh[eCh],
-        GTK_WIDGET(ResCombo),
+        GTK_WIDGET(ResCombo[eCh]),
         1, GRID_ORDER_RESOLUTION, 1, 1
     );    
 }
@@ -319,61 +320,61 @@ static void draw_framerate(API_HVC_CHN_E *pCh)
 {
     API_HVC_CHN_E eCh = *pCh;
 
-    FramerateLabel = gtk_label_new("Frame Rate: ");
-    FramerateCombo = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
+    FpsLabel[eCh] = gtk_label_new("Frame Rate: ");
+    FpsCombo[eCh] = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
 
     gtk_combo_box_text_append_text
     (
-        FramerateCombo,
+        FpsCombo[eCh],
         "24"
     );
     gtk_combo_box_text_append_text
     (
-        FramerateCombo,
+        FpsCombo[eCh],
         "25"
     );
     gtk_combo_box_text_append_text
     (
-        FramerateCombo,
+        FpsCombo[eCh],
         "29.97"
     );
     gtk_combo_box_text_append_text
     (
-        FramerateCombo,
+        FpsCombo[eCh],
         "30"
     );
     gtk_combo_box_text_append_text
     (
-        FramerateCombo,
+        FpsCombo[eCh],
         "50"
     );
     gtk_combo_box_text_append_text
     (
-        FramerateCombo,
+        FpsCombo[eCh],
         "59.94"
     );
     gtk_combo_box_text_append_text
     (
-        FramerateCombo,
+        FpsCombo[eCh],
         "60"
     );
     
-    gtk_combo_box_set_active(GTK_COMBO_BOX(FramerateCombo), 0);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(FpsCombo[eCh]), 0);
     
-    g_signal_connect(FramerateCombo, "changed" , G_CALLBACK(handler_framerate), &eCh1);
+    g_signal_connect(FpsCombo[eCh], "changed" , G_CALLBACK(handler_framerate), &eCh1);
     
     // Attatch framerate
     gtk_grid_attach
     (
         GridCh[eCh],
-        FramerateLabel,
+        FpsLabel[eCh],
         0, GRID_ORDER_FRAMERATE, 1, 1
     );
 
     gtk_grid_attach
     (
         GridCh[eCh],
-        GTK_WIDGET(FramerateCombo),
+        GTK_WIDGET(FpsCombo[eCh]),
         1, GRID_ORDER_FRAMERATE, 1, 1
     );
 }
@@ -383,21 +384,21 @@ static void draw_bitrate(API_HVC_CHN_E *pCh)
     API_HVC_CHN_E eCh = *pCh;
 
     // Bitrate field
-    BitrateLabel    = gtk_label_new ("Bitrate (kbps): ");
-    Bitrate         = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 1000.0, 32000.0, 1000.0);
+    BitrateLabel[eCh] = gtk_label_new("Bitrate (kbps): ");
+    Bitrate[eCh]      = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 1000.0, 32000.0, 1000.0);
 
     // Attach Bitrate
     gtk_grid_attach
     (
         GridCh[eCh],
-        BitrateLabel,
+        BitrateLabel[eCh],
         0, GRID_ORDER_BITRATE, 1, 1
     );
 
     gtk_grid_attach
     (
         GridCh[eCh],
-        Bitrate,
+        Bitrate[eCh],
         1, GRID_ORDER_BITRATE, 1, 1
     );
 }
@@ -732,9 +733,9 @@ static void make_output_file_name
     const char *timestamp, char *es_file_name_p, size_t length
 )
 {
-	int result;
+    int result;
 
-	result = snprintf( es_file_name_p, ( length - 1 ), FMB_ES_FILE_NAME_FORMAT, timestamp);
+    result = snprintf( es_file_name_p, ( length - 1 ), FMB_ES_FILE_NAME_FORMAT, timestamp);
 }
 
 
@@ -956,7 +957,7 @@ static void *encode_thr_fn(void *data)
     
     guint bitrate_val;
 
-    bitrate_val = gtk_range_get_value( GTK_RANGE(Bitrate) );
+    bitrate_val = gtk_range_get_value(GTK_RANGE(Bitrate[eCh]));
     
     LOG("Bitrate %d kbps\n", bitrate_val);
     

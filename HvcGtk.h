@@ -74,9 +74,9 @@ extern GtkWidget *Lv40RadioButton[API_HVC_CHN_MAX];
 
 extern GtkWidget *TierMainRadioButton[API_HVC_CHN_MAX];
 
-extern GtkComboBoxText *ResCombo;
+extern GtkComboBoxText *ResCombo[API_HVC_CHN_MAX];
 
-extern GtkComboBoxText *FramerateCombo;
+extern GtkComboBoxText *FpsCombo[API_HVC_CHN_MAX];
 
 extern GtkWidget *Bitdepth8RadioButton;
 
