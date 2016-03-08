@@ -103,7 +103,6 @@ GtkWidget *OpenButton[API_HVC_CHN_MAX];
 GtkWidget *EncodeButton[API_HVC_CHN_MAX];
 GtkWidget *ProgressBar[API_HVC_CHN_MAX];
 
-API_HVC_IMG_T img;
 POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
 static ENCODE_CALLBACK_PARAM_T tEncodeParam[API_HVC_CHN_MAX];
 static OPEN_CALLBACK_PARAM_T   tOpenParam[API_HVC_CHN_MAX];
@@ -133,7 +132,7 @@ API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX] =
         .eTargetFrameRate = API_HVC_FPS_24,
         .u32Bitrate     = 32000,
         
-        .eDbgLevel = API_HVC_DBG_LEVEL_3,
+        .eDbgLevel = API_HVC_DBG_LEVEL_0,
     },
     {
         .eInputMode     = API_HVC_INPUT_MODE_DATA,
@@ -152,7 +151,7 @@ API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX] =
         .eTargetFrameRate = API_HVC_FPS_24,
         .u32Bitrate     = 32000,
         
-        .eDbgLevel = API_HVC_DBG_LEVEL_3,
+        .eDbgLevel = API_HVC_DBG_LEVEL_0,
     },
 };
 
@@ -645,6 +644,7 @@ static void draw_run(API_HVC_CHN_E eCh)
     EncodeButton[eCh] = gtk_button_new_with_label("Run");
 
     tEncodeParam[eCh].eCh = eCh;
+    tEncodeParam[eCh].window = window;
     g_signal_connect(EncodeButton[eCh], "clicked", G_CALLBACK(handler_run), &tEncodeParam[eCh]);
 
     // Attach encode

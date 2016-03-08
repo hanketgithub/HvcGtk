@@ -67,6 +67,7 @@ typedef struct
 typedef struct
 {
     API_HVC_CHN_E eCh;
+    GtkWidget *window;
 } ENCODE_CALLBACK_PARAM_T; 
 
 typedef struct
@@ -109,8 +110,6 @@ extern GtkWidget *BNumScale[API_HVC_CHN_MAX];
 
 extern GtkWidget *ProgressBar[API_HVC_CHN_MAX];
 
-
-extern API_HVC_IMG_T img;
 extern POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
 extern API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX];
 

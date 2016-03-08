@@ -14,6 +14,8 @@
 #include "libhvc_venc/HVC_types.h"
 #include "HvcGtk.h"
 
+static API_HVC_IMG_T img[API_HVC_CHN_MAX];
+
 void handler_profile(GtkWidget *widget, gpointer *data)
 {    
     GSList *list; 
@@ -277,6 +279,7 @@ void handler_pixfmt(GtkWidget *widget, gpointer *data)
     GSList *list; 
     GtkToggleButton *button = NULL;
     API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
+    API_HVC_IMG_T *pImg = &img[eCh];
     
     list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(PixFmtNV12RadioButton[eCh]));
     
@@ -295,11 +298,11 @@ void handler_pixfmt(GtkWidget *widget, gpointer *data)
     
     if (strcmp(val, "NV12") == 0)
     {
-        img.eFormat = API_HVC_IMAGE_FORMAT_NV12;
+        pImg->eFormat = API_HVC_IMAGE_FORMAT_NV12;
     }
     else if (strcmp(val, "420P") == 0)
     {
-        img.eFormat = API_HVC_IMAGE_FORMAT_YUV420;
+        pImg->eFormat = API_HVC_IMAGE_FORMAT_YUV420;
     }
     
     LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -869,7 +872,9 @@ static void *encode_thr_fn(void *data)
     tPopEsArgs[eBoard][eCh].total_frame = remain_frame;
     tPopEsArgs[eBoard][eCh].poped_frame = 0;
     
-    vraw_data_buf_p = malloc(frame_sz);;
+    vraw_data_buf_p = malloc(frame_sz);
+
+    API_HVC_IMG_T *pImg = &img[eCh];
 
     while (remain_frame > 0)
     {        
@@ -877,12 +882,12 @@ static void *encode_thr_fn(void *data)
 
         remain_frame--;
 
-        img.pu8Addr     = vraw_data_buf_p;
-        img.u32Size     = frame_sz;
-        img.pts         = GET_PTS_IN_MS(eCh, tPopEsArgs[eBoard][eCh].total_frame - remain_frame);
-        img.bLastFrame  = (remain_frame == 0) ? true : false;
+        pImg->pu8Addr     = vraw_data_buf_p;
+        pImg->u32Size     = frame_sz;
+        pImg->pts         = GET_PTS_IN_MS(eCh, tPopEsArgs[eBoard][eCh].total_frame - remain_frame);
+        pImg->bLastFrame  = (remain_frame == 0) ? true : false;
 
-        if (HVC_ENC_PushImage(eBoard, eCh, &img))
+        if (HVC_ENC_PushImage(eBoard, eCh, pImg))
         {
             sprintf(err_msg, "Error: %s PushImage failed!\n", __FILE__);
 
@@ -895,7 +900,7 @@ static void *encode_thr_fn(void *data)
     // try stop
     while (HVC_ENC_Stop(eBoard, eCh))
     {
-        sleep(1);
+        usleep(1);
     }
     LOG("\n stop complete!\n");
 
@@ -920,6 +925,25 @@ callback_encode_ret:
 
 void handler_run(GtkWidget *button, ENCODE_CALLBACK_PARAM_T *param)
 {
+    if (FilenameRawYUV[param->eCh] == NULL)
+    {
+        GtkWidget *dialog;
+
+        dialog = gtk_message_dialog_new
+                 (
+                      GTK_WINDOW(param->window),
+                      GTK_DIALOG_DESTROY_WITH_PARENT,
+                      GTK_MESSAGE_ERROR,
+                      GTK_BUTTONS_OK,
+                      "Error opening file"
+                 );
+
+        gtk_window_set_title(GTK_WINDOW(dialog), "Error");
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+        return;
+    }
+
     pthread_t tid;
     pthread_create
     (
