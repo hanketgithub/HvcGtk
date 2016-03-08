@@ -128,30 +128,39 @@ void handler_res(GtkWidget *widget, gpointer *data)
     
     val = gtk_combo_box_text_get_active_text(ResCombo[eCh]);
 
-    if (strcmp(val, "3840x2160") == 0)
+    if (strcmp(val, RESOLUTION_DCI_4K_TEXT) == 0)
+    {
+        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_4096x2160;
+        tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_1CH_4K2K;
+    }
+    else if (strcmp(val, RESOLUTION_4K_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_3840x2160;
         tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_1CH_4K2K;
     }
-    else if (strcmp(val, "1920x1080") == 0)
+    else if (strcmp(val, RESOLUTION_2K_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_1920x1080;
         tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_4CH_1080P;
     }
-    else if (strcmp(val, "1280x720") == 0)
+    else if (strcmp(val, RESOLUTION_HD_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_1280x720;
         tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_8CH_720P;
     }
-    else if (strcmp(val, "720x576") == 0)
+    else if (strcmp(val, RESOLUTION_SD_576_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_720x576;
         tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_16CH_SD;
     }
-    else if (strcmp(val, "720x480") == 0)
+    else if (strcmp(val, RESOLUTION_SD_480_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_720x480;
         tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_16CH_SD;
+    }
+    else
+    {
+        LOG("%s: Invalid resolution!\n", __FUNCTION__);
     }
         
     LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -475,6 +484,12 @@ static size_t calculate_vraw_enqueue_data_size(API_HVC_INIT_PARAM_T *p_init_para
             vsize_va = 2160;
             break;
         }
+        case API_HVC_RESOLUTION_4096x2160:
+        {
+            hsize_va = 4096;
+            vsize_va = 2160;
+            break;
+        }
         default:
         {
             hsize_va = 3840;
@@ -517,10 +532,10 @@ static void make_output_file_name
 static void *encode_thr_fn(void *data)
 {
     ENCODE_CALLBACK_PARAM_T *param = (ENCODE_CALLBACK_PARAM_T *) data;
-    printf("%p\n", param);
     API_HVC_CHN_E eCh = param->eCh;
     char *str_profile = (tApiHvcInitParam[eCh].eProfile == API_HVC_HEVC_MAIN_PROFILE) ? "Main" : "Main10";
-    
+
+    LOG("%p Channel: %d\n", param, eCh);
     LOG("Profile: %s\n", str_profile);
     
     char *str_level;
@@ -567,9 +582,20 @@ static void *encode_thr_fn(void *data)
     
     switch (tApiHvcInitParam[eCh].eResolution)
     {
+        case API_HVC_RESOLUTION_4096x2160:
+        {
+            str_res = RESOLUTION_DCI_4K_TEXT;
+
+            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
+            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
+            
+            break;
+        }
         case API_HVC_RESOLUTION_3840x2160:
         {
-            str_res = "3840x2160";
+            str_res = RESOLUTION_4K_TEXT;
 
             tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
             tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
@@ -580,7 +606,7 @@ static void *encode_thr_fn(void *data)
         }        
         case API_HVC_RESOLUTION_1920x1080:
         {
-            str_res = "1920x1080";
+            str_res = RESOLUTION_2K_TEXT;
 
             tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
             tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
@@ -591,7 +617,7 @@ static void *encode_thr_fn(void *data)
         }        
         case API_HVC_RESOLUTION_1280x720:
         {
-            str_res = "1280x720";
+            str_res = RESOLUTION_HD_TEXT;
 
             tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
             tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
@@ -602,7 +628,7 @@ static void *encode_thr_fn(void *data)
         }        
         case API_HVC_RESOLUTION_720x576:
         {
-            str_res = "720x576";
+            str_res = RESOLUTION_SD_576_TEXT;
             
             tApiHvcInitParam[eCh].eAspectRatioIdc = API_HVC_HEVC_ASPECT_RATIO_IDC_4;
 
@@ -615,7 +641,7 @@ static void *encode_thr_fn(void *data)
         }   
         case API_HVC_RESOLUTION_720x480:
         {
-            str_res = "720x480";
+            str_res = RESOLUTION_SD_480_TEXT;
 
             tApiHvcInitParam[eCh].eAspectRatioIdc = API_HVC_HEVC_ASPECT_RATIO_IDC_5;
             

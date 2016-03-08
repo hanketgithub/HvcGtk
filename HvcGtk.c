@@ -122,7 +122,7 @@ API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX] =
         .eLevel         = API_HVC_HEVC_LEVEL_40,
         .eTier          = API_HVC_HEVC_MAIN_TIER,
         
-        .eResolution    = API_HVC_RESOLUTION_3840x2160,
+        .eResolution    = API_HVC_RESOLUTION_4096x2160,
         .eChromaFmt     = API_HVC_CHROMA_FORMAT_420,
         .eBitDepth      = API_HVC_BIT_DEPTH_8,
 
@@ -141,7 +141,7 @@ API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX] =
         .eLevel         = API_HVC_HEVC_LEVEL_40,
         .eTier          = API_HVC_HEVC_MAIN_TIER,
         
-        .eResolution    = API_HVC_RESOLUTION_3840x2160,
+        .eResolution    = API_HVC_RESOLUTION_1920x1080,
         .eChromaFmt     = API_HVC_CHROMA_FORMAT_420,
         .eBitDepth      = API_HVC_BIT_DEPTH_8,
 
@@ -286,31 +286,39 @@ static void draw_res(API_HVC_CHN_E *pCh)
     // Resolution field
     ResLabel[eCh] = gtk_label_new("Resolution: ");
     ResCombo[eCh] = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
-    
+
+    if (eCh == API_HVC_CHN_1)
+    {
+        gtk_combo_box_text_append_text
+        (
+            ResCombo[eCh],
+            RESOLUTION_DCI_4K_TEXT
+        );    
+        gtk_combo_box_text_append_text
+        (
+            ResCombo[eCh],
+            RESOLUTION_4K_TEXT
+        );
+    }
     gtk_combo_box_text_append_text
     (
         ResCombo[eCh],
-        "3840x2160"
+        RESOLUTION_2K_TEXT
     );
     gtk_combo_box_text_append_text
     (
         ResCombo[eCh],
-        "1920x1080"
-    );
-    gtk_combo_box_text_append_text
-    (
-        ResCombo[eCh],
-        "1280x720"
+        RESOLUTION_HD_TEXT
     );    
     gtk_combo_box_text_append_text
     (
         ResCombo[eCh],
-        "720x576"
+        RESOLUTION_SD_576_TEXT
     );   
     gtk_combo_box_text_append_text
     (
         ResCombo[eCh],
-        "720x480"
+        RESOLUTION_SD_480_TEXT
     );  
     gtk_combo_box_set_active(GTK_COMBO_BOX(ResCombo[eCh]), 0);
     
@@ -691,7 +699,6 @@ int main(int argc, char *argv[])
     gtk_window_set_title(GTK_WINDOW(window), "HVC-8700");
     gtk_container_set_border_width(GTK_CONTAINER(window), 10);
     gtk_widget_set_size_request(window, 150, 100);
-    //g_signal_connect(GTK_WINDOW(window), "delete_event", G_CALLBACK(gtk_window_close), NULL);
 
     notebook = GTK_NOTEBOOK(gtk_notebook_new());
 

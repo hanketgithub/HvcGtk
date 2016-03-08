@@ -28,6 +28,16 @@
 #define GRID_ORDER_BAR          14
 
 
+
+#define RESOLUTION_DCI_4K_TEXT  "4096x2160"
+#define RESOLUTION_4K_TEXT      "3840x2160"
+#define RESOLUTION_2K_TEXT      "1920x1080"
+#define RESOLUTION_HD_TEXT      "1280x720"
+#define RESOLUTION_SD_576_TEXT  "720x576"
+#define RESOLUTION_SD_480_TEXT  "720x480"
+
+
+
 #define GET_PTS_IN_MS(eCh, frame_order)    ((frame_order) * 1000 / tApiHvcInitParam[eCh].eTargetFrameRate)
 
 
