@@ -37,11 +37,11 @@ void handler_profile(GtkWidget *widget, gpointer *data)
     
     const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
-    if (strcmp(val, "Main") == 0)
+    if (strcmp(val, PROFILE_MAIN_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eProfile = API_HVC_HEVC_MAIN_PROFILE;
     }
-    else if (strcmp(val, "Main10") == 0)
+    else if (strcmp(val, PROFILE_MAIN10_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eProfile = API_HVC_HEVC_MAIN10_PROFILE;
     }
@@ -70,19 +70,19 @@ void handler_level(GtkWidget *widget, gpointer *data)
     
     const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
-    if (strcmp(val, "4.0") == 0)
+    if (strcmp(val, LV_40_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_40;
     }
-    else if (strcmp(val, "4.1") == 0)
+    else if (strcmp(val, LV_41_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_41;
     }
-    else if (strcmp(val, "5.0") == 0)
+    else if (strcmp(val, LV_50_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_50;
     }
-    else if (strcmp(val, "5.1") == 0)
+    else if (strcmp(val, LV_51_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_51;
     }
@@ -111,11 +111,11 @@ void handler_tier(GtkWidget *widget, gpointer *data)
     
     const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
-    if (strcmp(val, "Main") == 0)
+    if (strcmp(val, TIER_MAIN_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eTier = API_HVC_HEVC_MAIN_TIER;
     }
-    else if (strcmp(val, "High") == 0)
+    else if (strcmp(val, TIER_HIGH_TEXT) == 0)
     {
         tApiHvcInitParam[eCh].eTier = API_HVC_HEVC_HIGH_TIER;
     }
@@ -281,7 +281,7 @@ void handler_pixfmt(GtkWidget *widget, gpointer *data)
     API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
     API_HVC_IMG_T *pImg = &img[eCh];
     
-    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(PixFmtNV12RadioButton[eCh]));
+    list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(PixFmtIntRadioButton[eCh]));
     
     while (list) // As long as we didn't reach the end of the group.
     {
@@ -296,11 +296,23 @@ void handler_pixfmt(GtkWidget *widget, gpointer *data)
     
     const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
     
-    if (strcmp(val, "NV12") == 0)
+    if (strcmp(val, PIXEL_FMT_INTERLEAVE_TEXT) == 0)
     {
-        pImg->eFormat = API_HVC_IMAGE_FORMAT_NV12;
+        switch (tApiHvcInitParam[eCh].eChromaFmt)
+        {
+        case API_HVC_CHROMA_FORMAT_420:
+        {
+            pImg->eFormat = API_HVC_IMAGE_FORMAT_NV12;
+            break;
+        }
+        case API_HVC_CHROMA_FORMAT_422:
+        {
+            pImg->eFormat = API_HVC_IMAGE_FORMAT_NV16;
+            break;
+        }
+        }
     }
-    else if (strcmp(val, "420P") == 0)
+    else if (strcmp(val, PIXEL_FMT_PLANAR_TEXT) == 0)
     {
         pImg->eFormat = API_HVC_IMAGE_FORMAT_YUV420;
     }
@@ -427,7 +439,6 @@ static size_t calculate_vraw_enqueue_data_size(API_HVC_INIT_PARAM_T *p_init_para
             bit_depth = 10;
             break;
         }
-
         default:
         {
             bit_depth = 8;
@@ -747,6 +758,50 @@ static void *encode_thr_fn(void *data)
     
     LOG("Chroma: %s\n", str_chroma);
 
+    {
+        GSList *list; 
+        GtkToggleButton *button = NULL;
+        API_HVC_IMG_T *pImg = &img[eCh];
+        
+        list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(PixFmtIntRadioButton[eCh]));
+        
+        while (list) // As long as we didn't reach the end of the group.
+        {
+            button = list->data;    // Get one of the buttons in the group.
+            list = list->next;      // Next time we're going to check this one.
+
+            if (gtk_toggle_button_get_active(button))
+            {
+                break;
+            }
+        }
+        
+        const gchar *val = gtk_button_get_label(GTK_BUTTON(button));
+        
+        if (strcmp(val, PIXEL_FMT_INTERLEAVE_TEXT) == 0)
+        {
+            switch (tApiHvcInitParam[eCh].eChromaFmt)
+            {
+                case API_HVC_CHROMA_FORMAT_422:
+                {
+                    pImg->eFormat = API_HVC_IMAGE_FORMAT_NV16;
+                    break;
+                }
+                case API_HVC_CHROMA_FORMAT_420:
+                default:
+                {
+                    pImg->eFormat = API_HVC_IMAGE_FORMAT_NV12;
+                    break;
+                }
+            }
+        }
+        else if (strcmp(val, PIXEL_FMT_PLANAR_TEXT) == 0)
+        {
+            pImg->eFormat = API_HVC_IMAGE_FORMAT_YUV420;
+        }
+        
+        LOG("%s: %s selected\n", __FUNCTION__, val);
+    }
     
     char *str_gop = "Unknown";
 

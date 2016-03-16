@@ -28,6 +28,16 @@
 #define GRID_ORDER_BAR          14
 
 
+#define PROFILE_MAIN_TEXT       "Main"
+#define PROFILE_MAIN10_TEXT     "Main10"
+
+#define LV_40_TEXT              "4.0"
+#define LV_41_TEXT              "4.1"
+#define LV_50_TEXT              "5.0"
+#define LV_51_TEXT              "5.1"
+
+#define TIER_MAIN_TEXT          "Main"
+#define TIER_HIGH_TEXT          "High"
 
 #define RESOLUTION_DCI_4K_TEXT  "4096x2160"
 #define RESOLUTION_4K_TEXT      "3840x2160"
@@ -35,6 +45,9 @@
 #define RESOLUTION_HD_TEXT      "1280x720"
 #define RESOLUTION_SD_576_TEXT  "720x576"
 #define RESOLUTION_SD_480_TEXT  "720x480"
+
+#define PIXEL_FMT_INTERLEAVE_TEXT   "Interleave"
+#define PIXEL_FMT_PLANAR_TEXT       "Planar"
 
 
 
@@ -98,7 +111,7 @@ extern GtkWidget *Bitrate[API_HVC_CHN_MAX];
 
 extern GtkWidget *Chroma420RadioButton[API_HVC_CHN_MAX];
 
-extern GtkWidget *PixFmtNV12RadioButton[API_HVC_CHN_MAX];
+extern GtkWidget *PixFmtIntRadioButton[API_HVC_CHN_MAX];
 
 extern GtkWidget *GopIbRadioButton[API_HVC_CHN_MAX];
 
