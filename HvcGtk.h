@@ -55,7 +55,7 @@
 
 
 #define FMB_TIMESTAMP_FORMAT        "%H%M%S"
-#define FMB_ES_FILE_NAME_FORMAT     "es_%s.265"
+#define GTK_ES_FILE_NAME_FORMAT     "%s_%s.265"
 
 
 extern FILE *__hvc_encoder_logging__;

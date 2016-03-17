@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <fcntl.h>
+#include <libgen.h>
 
 #include "libhvc_venc/HVC_types.h"
 #include "HvcGtk.h"
@@ -520,7 +521,7 @@ static size_t calculate_vraw_enqueue_data_size(API_HVC_INIT_PARAM_T *p_init_para
 }
 
 
-void make_timestamp(char * timestamp_p, size_t size)
+static void make_timestamp(char * timestamp_p, size_t size)
 {
     time_t now;
     struct tm *now_tm_p;
@@ -535,13 +536,22 @@ void make_timestamp(char * timestamp_p, size_t size)
 
 static void make_output_file_name
 (
-    const char *timestamp, char *es_file_name_p, size_t length
+    const char *timestamp,
+    char *es_file_name_p,
+    size_t length,
+    char *path
 )
 {
-    int result;
+    char *bname = basename(path);
+    char *cp = strchr(bname, '.');
+    char output[255];
 
-    result = snprintf(es_file_name_p, ( length - 1 ), FMB_ES_FILE_NAME_FORMAT, timestamp);
+    memset(output, 0, sizeof(output));
+    strncpy(output, bname, cp - bname);
+
+    snprintf(es_file_name_p, (length - 1), GTK_ES_FILE_NAME_FORMAT, output, timestamp);
 }
+
 
 static void *encode_thr_fn(void *data)
 {
@@ -908,10 +918,10 @@ static void *encode_thr_fn(void *data)
     char timestamp[15];
 
     make_timestamp(timestamp, sizeof(timestamp));
-    make_output_file_name(timestamp, es_file_name, FILENAME_MAX);
+    make_output_file_name(timestamp, es_file_name, FILENAME_MAX, FilenameRawYUV[eCh]);
 
     fd_r[eCh]  = open(FilenameRawYUV[eCh], O_RDONLY);
-    fd_w[eCh]   = open(es_file_name, 
+    fd_w[eCh]  = open(es_file_name, 
                     O_WRONLY | O_CREAT,
                     S_IRWXU);
                  
@@ -1028,7 +1038,7 @@ void handler_open(GtkWidget *button, OPEN_CALLBACK_PARAM_T *param)
     {
         FilenameRawYUV[param->eCh] = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
-        gtk_button_set_label(GTK_BUTTON(button), FilenameRawYUV[param->eCh]);
+        gtk_button_set_label(GTK_BUTTON(button), basename(FilenameRawYUV[param->eCh]));
     }
 
     gtk_widget_destroy(dialog);
