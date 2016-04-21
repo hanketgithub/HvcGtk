@@ -12,7 +12,7 @@
 #include <fcntl.h>
 #include <libgen.h>
 
-#include "libhvc_venc/HVC_types.h"
+#include "libhvc_venc/inc/HVC_types.h"
 #include "HvcGtk.h"
 
 static API_HVC_IMG_T img[API_HVC_CHN_MAX];

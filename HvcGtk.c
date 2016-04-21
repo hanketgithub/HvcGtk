@@ -17,8 +17,8 @@
 #include <fcntl.h>
 
 
-#include "libhvc_venc/HVC_types.h"
-#include "libhvc_venc/HVC_encoder.h"
+#include "libhvc_venc/inc/HVC_types.h"
+#include "libhvc_venc/inc/HVC_encoder.h"
 #include "HvcGtk.h"
 #include "handler.h"
 
@@ -39,7 +39,9 @@ GtkWidget *window;
 GtkNotebook *notebook;
 GtkWidget *Label1;
 GtkWidget *Label2;
+GtkWidget *Label3;
 GtkGrid   *GridCh[API_HVC_CHN_MAX];
+GtkGrid   *GridAbout;
 
 GtkWidget *ProfileLabel[API_HVC_CHN_MAX];
 GtkWidget *ProfileMainRadioButton[API_HVC_CHN_MAX];
@@ -102,6 +104,21 @@ GtkWidget *BNumScale[API_HVC_CHN_MAX];
 GtkWidget *OpenButton[API_HVC_CHN_MAX];
 GtkWidget *EncodeButton[API_HVC_CHN_MAX];
 GtkWidget *ProgressBar[API_HVC_CHN_MAX];
+
+GtkWidget *CopyRight;
+GtkWidget *ApiLabel;
+GtkWidget *ApiVersion;
+GtkWidget *DrvLabel;
+GtkWidget *DrvVersion;
+GtkWidget *SysFwLabel;
+GtkWidget *SysFwVersion;
+GtkWidget *McpuLabel;
+GtkWidget *McpuVersion;
+GtkWidget *FwSingleLabel;
+GtkWidget *FwSingleVersion;
+GtkWidget *FwMultiLabel;
+GtkWidget *FwMultiVersion;
+
 
 POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
 static ENCODE_CALLBACK_PARAM_T tEncodeParam[API_HVC_CHN_MAX];
@@ -704,10 +721,11 @@ int main(int argc, char *argv[])
 
     Label1  = gtk_label_new("Channel 1");
     Label2  = gtk_label_new("Channel 2");
+    Label3  = gtk_label_new("About");
 
     GridCh[eCh1] = GTK_GRID(gtk_grid_new());
     GridCh[eCh2] = GTK_GRID(gtk_grid_new());
-
+    GridAbout    = GTK_GRID(gtk_grid_new());
 
     // Create Channel 1 panel
     draw_profile(&eCh1);
@@ -747,14 +765,121 @@ int main(int argc, char *argv[])
     draw_open(window, eCh2);
     draw_bar(eCh2);
 
+    // Create About panel
+    CopyRight   = gtk_label_new("Copyright (C) 2015 Advantech Co.");
+    ApiLabel    = gtk_label_new("API Version:");
+    DrvLabel    = gtk_label_new("DRV Version:");
+    SysFwLabel  = gtk_label_new("System FW version:");
+    McpuLabel   = gtk_label_new("MCPU FW version:");
+    FwSingleLabel = gtk_label_new("Single FW version:");
+    FwMultiLabel = gtk_label_new("Multi FW version:");
+
+    API_HVC_VERSION_INFO_T t_ver;
+
+    memset(&t_ver, 0, sizeof(t_ver));
+    HVC_ENC_GetVersion(0, &t_ver);
+    char str_api_ver[255];
+    sprintf(str_api_ver, "%d.%d.%d.%d", 
+        t_ver.u32KernelVer, t_ver.u32MajorVer, t_ver.u32MinorVer, t_ver.u32SvnVer);
+    ApiVersion      = gtk_label_new(str_api_ver);
+    DrvVersion      = gtk_label_new(t_ver.u8Driver);
+    SysFwVersion    = gtk_label_new(t_ver.u8SystemFirm);
+    char str_mcpu_ver[255];
+    sprintf(str_mcpu_ver, "%d.%d.%d.%d", 
+        t_ver.u32McpuKernelVer, t_ver.u32McpuMajorVer, t_ver.u32McpuMinorVer, t_ver.u32McpuExtraVer);
+    McpuVersion     = gtk_label_new(str_mcpu_ver);
+    FwSingleVersion = gtk_label_new(t_ver.u8HevcEncoderStdFirmSingle);
+    FwMultiVersion = gtk_label_new(t_ver.u8HevcEncoderStdFirmMulti);
+
+    gtk_grid_attach
+    (
+        GridAbout,
+        CopyRight,
+        0, 0, 2, 1
+    );    
+    gtk_grid_attach
+    (
+        GridAbout,
+        ApiLabel,
+        0, 1, 1, 1
+    );  
+    gtk_grid_attach
+    (
+        GridAbout,
+        ApiVersion,
+        1, 1, 1, 1
+    ); 
+    gtk_grid_attach
+    (
+        GridAbout,
+        DrvLabel,
+        0, 2, 1, 1
+    );  
+    gtk_grid_attach
+    (
+        GridAbout,
+        DrvVersion,
+        1, 2, 1, 1
+    ); 
+    gtk_grid_attach
+    (
+        GridAbout,
+        SysFwLabel,
+        0, 3, 1, 1
+    ); 
+    gtk_grid_attach
+    (
+        GridAbout,
+        SysFwVersion,
+        1, 3, 1, 1
+    ); 
+    gtk_grid_attach
+    (
+        GridAbout,
+        McpuLabel,
+        0, 4, 1, 1
+    ); 
+    gtk_grid_attach
+    (
+        GridAbout,
+        McpuVersion,
+        1, 4, 1, 1
+    ); 
+    gtk_grid_attach
+    (
+        GridAbout,
+        FwSingleLabel,
+        0, 5, 1, 1
+    ); 
+    gtk_grid_attach
+    (
+        GridAbout,
+        FwSingleVersion,
+        1, 5, 1, 1
+    );
+    gtk_grid_attach
+    (
+        GridAbout,
+        FwMultiLabel,
+        0, 6, 1, 1
+    ); 
+    gtk_grid_attach
+    (
+        GridAbout,
+        FwMultiVersion,
+        1, 6, 1, 1
+    );
+
     /* Append to pages to the notebook container. */
     gtk_notebook_append_page(notebook, GTK_WIDGET(GridCh[eCh1]), Label1);
     gtk_notebook_append_page(notebook, GTK_WIDGET(GridCh[eCh2]), Label2);
+    gtk_notebook_append_page(notebook, GTK_WIDGET(GridAbout), Label3);
 
 
     /* Add five pixels of spacing between every row and every column. */
     gtk_grid_set_row_spacing(GridCh[eCh1], 5);
     gtk_grid_set_row_spacing(GridCh[eCh2], 5);
+    gtk_grid_set_row_spacing(GridAbout, 5);
 
     gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(notebook));
     gtk_widget_show_all(window);
