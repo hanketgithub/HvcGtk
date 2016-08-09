@@ -51,7 +51,7 @@
 
 
 
-#define GET_PTS_IN_MS(eCh, frame_order)    ((frame_order) * 1000 / tApiHvcInitParam[eCh].eTargetFrameRate)
+#define GET_PTS_IN_MS(eCh, frame_order)    ((frame_order) * 1000 / tApiInitParam[eCh].eTargetFrameRate)
 
 
 #define FMB_TIMESTAMP_FORMAT        "%H%M%S"
@@ -71,60 +71,60 @@ extern FILE *ui_logging;
 
 typedef struct
 {
-    API_HVC_BOARD_E board_num;
-    API_HVC_CHN_E   channel;
-    uint32_t        total_frame;
-    uint32_t        poped_frame;
+    API_VENC_BOARD_E    board_num;
+    API_VENC_CHN_E      channel;
+    uint32_t            total_frame;
+    uint32_t            poped_frame;
 } POP_ES_CALLBACK_PARAM_T;
 
 typedef struct
 {
-    API_HVC_CHN_E eCh;
+    API_VENC_CHN_E eCh;
     GtkWidget *window;
 } ENCODE_CALLBACK_PARAM_T; 
 
 typedef struct
 {
-    API_HVC_CHN_E eCh;
+    API_VENC_CHN_E eCh;
     GtkWidget *window;
 } OPEN_CALLBACK_PARAM_T;
 
 
-extern gchar *FilenameRawYUV[API_HVC_CHN_MAX];
-extern int fd_r[API_HVC_CHN_MAX];
-extern int fd_w[API_HVC_CHN_MAX];
+extern gchar *FilenameRawYUV[API_VENC_CHN_MAX];
+extern int fd_r[API_VENC_CHN_MAX];
+extern int fd_w[API_VENC_CHN_MAX];
 extern char err_msg[FILENAME_MAX];
 
-extern GtkWidget *ProfileMainRadioButton[API_HVC_CHN_MAX];
+extern GtkWidget *ProfileMainRadioButton[API_VENC_CHN_MAX];
 
-extern GtkWidget *Lv40RadioButton[API_HVC_CHN_MAX];
+extern GtkWidget *Lv40RadioButton[API_VENC_CHN_MAX];
 
-extern GtkWidget *TierMainRadioButton[API_HVC_CHN_MAX];
+extern GtkWidget *TierMainRadioButton[API_VENC_CHN_MAX];
 
-extern GtkComboBoxText *ResCombo[API_HVC_CHN_MAX];
+extern GtkComboBoxText *ResCombo[API_VENC_CHN_MAX];
 
-extern GtkComboBoxText *FpsCombo[API_HVC_CHN_MAX];
+extern GtkComboBoxText *FpsCombo[API_VENC_CHN_MAX];
 
-extern GtkWidget *Bitdepth8RadioButton[API_HVC_CHN_MAX];
+extern GtkWidget *Bitdepth8RadioButton[API_VENC_CHN_MAX];
 
-extern GtkWidget *Bitrate[API_HVC_CHN_MAX];
+extern GtkWidget *Bitrate[API_VENC_CHN_MAX];
 
-extern GtkWidget *Chroma420RadioButton[API_HVC_CHN_MAX];
+extern GtkWidget *Chroma420RadioButton[API_VENC_CHN_MAX];
 
-extern GtkWidget *PixFmtIntRadioButton[API_HVC_CHN_MAX];
+extern GtkWidget *PixFmtIntRadioButton[API_VENC_CHN_MAX];
 
-extern GtkWidget *GopIbRadioButton[API_HVC_CHN_MAX];
+extern GtkWidget *GopIbRadioButton[API_VENC_CHN_MAX];
 
-extern GtkWidget *GopSizeEntry[API_HVC_CHN_MAX];
+extern GtkWidget *GopSizeEntry[API_VENC_CHN_MAX];
 
-extern GtkWidget *IdrIntervalEntry[API_HVC_CHN_MAX];
+extern GtkWidget *IdrIntervalEntry[API_VENC_CHN_MAX];
 
-extern GtkWidget *BNumScale[API_HVC_CHN_MAX];
+extern GtkWidget *BNumScale[API_VENC_CHN_MAX];
 
-extern GtkWidget *ProgressBar[API_HVC_CHN_MAX];
+extern GtkWidget *ProgressBar[API_VENC_CHN_MAX];
 
-extern POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
-extern API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX];
+extern POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_VENC_BOARD_MAX][API_VENC_CHN_MAX];
+extern API_VENC_INIT_PARAM_T tApiInitParam[API_VENC_CHN_MAX];
 
 #endif
 

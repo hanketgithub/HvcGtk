@@ -12,16 +12,17 @@
 #include <fcntl.h>
 #include <libgen.h>
 
-#include "libhvc_venc/inc/HVC_types.h"
+#include "apiVENC_types.h"
+#include "apiVENC.h"
 #include "HvcGtk.h"
 
-static API_HVC_IMG_T img[API_HVC_CHN_MAX];
+static API_VENC_IMG_T img[API_VENC_CHN_MAX];
 
 void handler_profile(GtkWidget *widget, gpointer *data)
 {    
     GSList *list; 
     GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
+    API_VENC_CHN_E eCh = (API_VENC_CHN_E) *data;
     
     list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(ProfileMainRadioButton[eCh]));
     
@@ -40,11 +41,11 @@ void handler_profile(GtkWidget *widget, gpointer *data)
     
     if (strcmp(val, PROFILE_MAIN_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eProfile = API_HVC_HEVC_MAIN_PROFILE;
+        tApiInitParam[eCh].eProfile = API_VENC_HEVC_MAIN_PROFILE;
     }
     else if (strcmp(val, PROFILE_MAIN10_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eProfile = API_HVC_HEVC_MAIN10_PROFILE;
+        tApiInitParam[eCh].eProfile = API_VENC_HEVC_MAIN10_PROFILE;
     }
 
     LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -54,7 +55,7 @@ void handler_level(GtkWidget *widget, gpointer *data)
 {
     GSList *list; 
     GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
+    API_VENC_CHN_E eCh = (API_VENC_CHN_E) *data;
     
     list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(Lv40RadioButton[eCh]));
     
@@ -73,19 +74,19 @@ void handler_level(GtkWidget *widget, gpointer *data)
     
     if (strcmp(val, LV_40_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_40;
+        tApiInitParam[eCh].eLevel = API_VENC_HEVC_LEVEL_40;
     }
     else if (strcmp(val, LV_41_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_41;
+        tApiInitParam[eCh].eLevel = API_VENC_HEVC_LEVEL_41;
     }
     else if (strcmp(val, LV_50_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_50;
+        tApiInitParam[eCh].eLevel = API_VENC_HEVC_LEVEL_50;
     }
     else if (strcmp(val, LV_51_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eLevel = API_HVC_HEVC_LEVEL_51;
+        tApiInitParam[eCh].eLevel = API_VENC_HEVC_LEVEL_51;
     }
     
     LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -95,7 +96,7 @@ void handler_tier(GtkWidget *widget, gpointer *data)
 {
     GSList *list; 
     GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
+    API_VENC_CHN_E eCh = (API_VENC_CHN_E) *data;
     
     list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(TierMainRadioButton[eCh]));
     
@@ -114,11 +115,11 @@ void handler_tier(GtkWidget *widget, gpointer *data)
     
     if (strcmp(val, TIER_MAIN_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eTier = API_HVC_HEVC_MAIN_TIER;
+        tApiInitParam[eCh].eTier = API_VENC_HEVC_MAIN_TIER;
     }
     else if (strcmp(val, TIER_HIGH_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eTier = API_HVC_HEVC_HIGH_TIER;
+        tApiInitParam[eCh].eTier = API_VENC_HEVC_HIGH_TIER;
     }
     
     LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -127,39 +128,39 @@ void handler_tier(GtkWidget *widget, gpointer *data)
 void handler_res(GtkWidget *widget, gpointer *data)
 {
     gchar *val = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
+    API_VENC_CHN_E eCh = (API_VENC_CHN_E) *data;
     
     val = gtk_combo_box_text_get_active_text(ResCombo[eCh]);
 
     if (strcmp(val, RESOLUTION_DCI_4K_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_4096x2160;
-        tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_1CH_4K2K;
+        tApiInitParam[eCh].eResolution = API_VENC_RESOLUTION_4096x2160;
+        tApiInitParam[eCh].eMemoryAllocMode = API_VENC_MEMORY_ALLOC_MODE_1CH_4K2K;
     }
     else if (strcmp(val, RESOLUTION_4K_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_3840x2160;
-        tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_1CH_4K2K;
+        tApiInitParam[eCh].eResolution = API_VENC_RESOLUTION_3840x2160;
+        tApiInitParam[eCh].eMemoryAllocMode = API_VENC_MEMORY_ALLOC_MODE_1CH_4K2K;
     }
     else if (strcmp(val, RESOLUTION_2K_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_1920x1080;
-        tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_4CH_1080P;
+        tApiInitParam[eCh].eResolution = API_VENC_RESOLUTION_1920x1080;
+        tApiInitParam[eCh].eMemoryAllocMode = API_VENC_MEMORY_ALLOC_MODE_4CH_1080P;
     }
     else if (strcmp(val, RESOLUTION_HD_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_1280x720;
-        tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_8CH_720P;
+        tApiInitParam[eCh].eResolution = API_VENC_RESOLUTION_1280x720;
+        tApiInitParam[eCh].eMemoryAllocMode = API_VENC_MEMORY_ALLOC_MODE_8CH_720P;
     }
     else if (strcmp(val, RESOLUTION_SD_576_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_720x576;
-        tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_16CH_SD;
+        tApiInitParam[eCh].eResolution = API_VENC_RESOLUTION_720x576;
+        tApiInitParam[eCh].eMemoryAllocMode = API_VENC_MEMORY_ALLOC_MODE_16CH_SD;
     }
     else if (strcmp(val, RESOLUTION_SD_480_TEXT) == 0)
     {
-        tApiHvcInitParam[eCh].eResolution = API_HVC_RESOLUTION_720x480;
-        tApiHvcInitParam[eCh].eMemoryAllocMode = API_HVC_MEMORY_ALLOC_MODE_16CH_SD;
+        tApiInitParam[eCh].eResolution = API_VENC_RESOLUTION_720x480;
+        tApiInitParam[eCh].eMemoryAllocMode = API_VENC_MEMORY_ALLOC_MODE_16CH_SD;
     }
     else
     {
@@ -173,37 +174,37 @@ void handler_res(GtkWidget *widget, gpointer *data)
 void handler_framerate(GtkWidget *widget, gpointer *data)
 {
     gchar *val = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
+    API_VENC_CHN_E eCh = (API_VENC_CHN_E) *data;
 
     val = gtk_combo_box_text_get_active_text(FpsCombo[eCh]);
     
     if (strcmp(val, "24") == 0)
     {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_24;
+        tApiInitParam[eCh].eTargetFrameRate = API_VENC_FPS_24;
     }
     else if (strcmp(val, "25") == 0)
     {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_25;
+        tApiInitParam[eCh].eTargetFrameRate = API_VENC_FPS_25;
     }
     else if (strcmp(val, "29.97") == 0)
     {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_29_97;
+        tApiInitParam[eCh].eTargetFrameRate = API_VENC_FPS_29_97;
     }
     else if (strcmp(val, "30") == 0)
     {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_30;
+        tApiInitParam[eCh].eTargetFrameRate = API_VENC_FPS_30;
     }
     else if (strcmp(val, "50") == 0)
     {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_50;
+        tApiInitParam[eCh].eTargetFrameRate = API_VENC_FPS_50;
     }
     else if (strcmp(val, "59.94") == 0)
     {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_59_94;
+        tApiInitParam[eCh].eTargetFrameRate = API_VENC_FPS_59_94;
     }
     else if (strcmp(val, "60") == 0)
     {
-        tApiHvcInitParam[eCh].eTargetFrameRate = API_HVC_FPS_60;
+        tApiInitParam[eCh].eTargetFrameRate = API_VENC_FPS_60;
     }
 
     LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -213,7 +214,7 @@ void handler_bitdepth(GtkWidget *widget, gpointer *data)
 {
     GSList *list; 
     GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
+    API_VENC_CHN_E eCh = (API_VENC_CHN_E) *data;
     
     list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(Bitdepth8RadioButton[eCh]));
     
@@ -232,11 +233,11 @@ void handler_bitdepth(GtkWidget *widget, gpointer *data)
     
     if (strcmp(val, "8") == 0)
     {
-        tApiHvcInitParam[eCh].eBitDepth = API_HVC_BIT_DEPTH_8;
+        tApiInitParam[eCh].eBitDepth = API_VENC_BIT_DEPTH_8;
     }
     else if (strcmp(val, "10") == 0)
     {
-        tApiHvcInitParam[eCh].eBitDepth = API_HVC_BIT_DEPTH_10;
+        tApiInitParam[eCh].eBitDepth = API_VENC_BIT_DEPTH_10;
     }
     
     LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -246,7 +247,7 @@ void handler_chroma(GtkWidget *widget, gpointer *data)
 {
     GSList *list; 
     GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
+    API_VENC_CHN_E eCh = (API_VENC_CHN_E) *data;
     
     list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(Chroma420RadioButton[eCh]));
     
@@ -265,11 +266,11 @@ void handler_chroma(GtkWidget *widget, gpointer *data)
     
     if (strcmp(val, "420") == 0)
     {
-        tApiHvcInitParam[eCh].eChromaFmt = API_HVC_CHROMA_FORMAT_420;
+        tApiInitParam[eCh].eChromaFmt = API_VENC_CHROMA_FORMAT_420;
     }
     else if (strcmp(val, "422") == 0)
     {
-        tApiHvcInitParam[eCh].eChromaFmt = API_HVC_CHROMA_FORMAT_422;
+        tApiInitParam[eCh].eChromaFmt = API_VENC_CHROMA_FORMAT_422;
     }
     
     LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -279,8 +280,8 @@ void handler_pixfmt(GtkWidget *widget, gpointer *data)
 {
     GSList *list; 
     GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
-    API_HVC_IMG_T *pImg = &img[eCh];
+    API_VENC_CHN_E eCh = (API_VENC_CHN_E) *data;
+    API_VENC_IMG_T *pImg = &img[eCh];
     
     list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(PixFmtIntRadioButton[eCh]));
     
@@ -299,33 +300,33 @@ void handler_pixfmt(GtkWidget *widget, gpointer *data)
     
     if (strcmp(val, PIXEL_FMT_INTERLEAVE_TEXT) == 0)
     {
-        switch (tApiHvcInitParam[eCh].eChromaFmt)
+        switch (tApiInitParam[eCh].eChromaFmt)
         {
-        case API_HVC_CHROMA_FORMAT_420:
+        case API_VENC_CHROMA_FORMAT_420:
         {
-            pImg->eFormat = API_HVC_IMAGE_FORMAT_NV12;
+            pImg->eFormat = API_VENC_IMAGE_FORMAT_NV12;
             break;
         }
-        case API_HVC_CHROMA_FORMAT_422:
+        case API_VENC_CHROMA_FORMAT_422:
         {
-            pImg->eFormat = API_HVC_IMAGE_FORMAT_NV16;
+            pImg->eFormat = API_VENC_IMAGE_FORMAT_NV16;
             break;
         }
         }
     }
     else if (strcmp(val, PIXEL_FMT_PLANAR_TEXT) == 0)
     {
-        pImg->eFormat = API_HVC_IMAGE_FORMAT_YUV420;
+        pImg->eFormat = API_VENC_IMAGE_FORMAT_YUV420;
     }
     
     LOG("%s: %s selected\n", __FUNCTION__, val);
 }
 
-void ui_process_coded_frame(API_HVC_HEVC_CODED_PICT_T *p_coded_pict, void *args)
+void ui_process_coded_frame(API_VENC_HEVC_CODED_PICT_T *p_coded_pict, void *args)
 {
     POP_ES_CALLBACK_PARAM_T *p_callback_param;
-    API_HVC_BOARD_E eBoard;
-    API_HVC_CHN_E eCh;
+    API_VENC_BOARD_E eBoard;
+    API_VENC_CHN_E eCh;
 
     p_callback_param = (POP_ES_CALLBACK_PARAM_T *) args;
 
@@ -374,7 +375,7 @@ void handler_gop(GtkWidget *widget, gpointer *data)
 {
     GSList *list; 
     GtkToggleButton *button = NULL;
-    API_HVC_CHN_E eCh = (API_HVC_CHN_E) *data;
+    API_VENC_CHN_E eCh = (API_VENC_CHN_E) *data;
     
     list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(GopIbRadioButton[eCh]));
     
@@ -393,32 +394,32 @@ void handler_gop(GtkWidget *widget, gpointer *data)
 
     if (strcmp(val, "IP") == 0)
     {
-        tApiHvcInitParam[eCh].eGopType = API_HVC_GOP_IP;
+        tApiInitParam[eCh].eGopType = API_VENC_GOP_IP;
         gtk_widget_set_sensitive(GTK_WIDGET(BNumScale[eCh]), FALSE);
     }
     else if (strcmp(val, "IB") == 0)
     {
-        tApiHvcInitParam[eCh].eGopType = API_HVC_GOP_IB;
+        tApiInitParam[eCh].eGopType = API_VENC_GOP_IB;
         gtk_widget_set_sensitive(GTK_WIDGET(BNumScale[eCh]), TRUE);
     }
     else if (strcmp(val, "IPB") == 0)
     {
-        tApiHvcInitParam[eCh].eGopType = API_HVC_GOP_IPB;
+        tApiInitParam[eCh].eGopType = API_VENC_GOP_IPB;
         gtk_widget_set_sensitive(GTK_WIDGET(BNumScale[eCh]), TRUE);
     }
     else if (strcmp(val, "I") == 0)
     {
-        tApiHvcInitParam[eCh].eGopType       = API_HVC_GOP_I;
-        tApiHvcInitParam[eCh].eGopSize       = API_HVC_GOP_SIZE_1;
-        tApiHvcInitParam[eCh].eIDRFrameNum   = API_HVC_IDR_FRAME_ALL;
-        tApiHvcInitParam[eCh].eBFrameNum     = API_HVC_B_FRAME_NONE;
+        tApiInitParam[eCh].eGopType       = API_VENC_GOP_I;
+        tApiInitParam[eCh].eGopSize       = API_VENC_GOP_SIZE_1;
+        tApiInitParam[eCh].eIDRFrameNum   = API_VENC_IDR_FRAME_ALL;
+        tApiInitParam[eCh].eBFrameNum     = API_VENC_B_FRAME_NONE;
         gtk_widget_set_sensitive(GTK_WIDGET(BNumScale[eCh]), FALSE); 
     }
     
     LOG("%s: %s selected\n", __FUNCTION__, val);
 }
 
-static size_t calculate_vraw_enqueue_data_size(API_HVC_INIT_PARAM_T *p_init_param)
+static size_t calculate_vraw_enqueue_data_size(API_VENC_INIT_PARAM_T *p_init_param)
 {
     uint32_t hsize_va;
     uint32_t vsize_va;
@@ -430,12 +431,12 @@ static size_t calculate_vraw_enqueue_data_size(API_HVC_INIT_PARAM_T *p_init_para
     // set bit-depth factor
     switch (p_init_param->eBitDepth)
     {
-        case API_HVC_BIT_DEPTH_8:
+        case API_VENC_BIT_DEPTH_8:
         {
             bit_depth = 8;
             break;
         }
-        case API_HVC_BIT_DEPTH_10:
+        case API_VENC_BIT_DEPTH_10:
         {
             bit_depth = 10;
             break;
@@ -450,12 +451,12 @@ static size_t calculate_vraw_enqueue_data_size(API_HVC_INIT_PARAM_T *p_init_para
     // set chrom factor
     switch (p_init_param->eChromaFmt)
     {
-        case API_HVC_CHROMA_FORMAT_420:
+        case API_VENC_CHROMA_FORMAT_420:
         {
             c_pixel_per_sample = 4;
             break;
         }
-        case API_HVC_CHROMA_FORMAT_422:
+        case API_VENC_CHROMA_FORMAT_422:
         {
             c_pixel_per_sample = 2;
             break;
@@ -469,37 +470,37 @@ static size_t calculate_vraw_enqueue_data_size(API_HVC_INIT_PARAM_T *p_init_para
 
     switch (p_init_param->eResolution)
     {
-        case API_HVC_RESOLUTION_720x480:
+        case API_VENC_RESOLUTION_720x480:
         {
             hsize_va = 720;
             vsize_va = 480;
             break;
         }
-        case API_HVC_RESOLUTION_720x576:
+        case API_VENC_RESOLUTION_720x576:
         {
             hsize_va = 720;
             vsize_va = 576;
             break;
         }
-        case API_HVC_RESOLUTION_1280x720:
+        case API_VENC_RESOLUTION_1280x720:
         {
             hsize_va = 1280;
             vsize_va = 720;
             break;
         }
-        case API_HVC_RESOLUTION_1920x1080:
+        case API_VENC_RESOLUTION_1920x1080:
         {
             hsize_va = 1920;
             vsize_va = 1080;
             break;
         }
-        case API_HVC_RESOLUTION_3840x2160:
+        case API_VENC_RESOLUTION_3840x2160:
         {
             hsize_va = 3840;
             vsize_va = 2160;
             break;
         }
-        case API_HVC_RESOLUTION_4096x2160:
+        case API_VENC_RESOLUTION_4096x2160:
         {
             hsize_va = 4096;
             vsize_va = 2160;
@@ -556,8 +557,8 @@ static void make_output_file_name
 static void *encode_thr_fn(void *data)
 {
     ENCODE_CALLBACK_PARAM_T *param = (ENCODE_CALLBACK_PARAM_T *) data;
-    API_HVC_CHN_E eCh = param->eCh;
-    char *str_profile = (tApiHvcInitParam[eCh].eProfile == API_HVC_HEVC_MAIN_PROFILE) ? "Main" : "Main10";
+    API_VENC_CHN_E eCh = param->eCh;
+    char *str_profile = (tApiInitParam[eCh].eProfile == API_VENC_HEVC_MAIN_PROFILE) ? "Main" : "Main10";
 
     LOG("%p Channel: %d\n", param, eCh);
     LOG("Profile: %s\n", str_profile);
@@ -566,24 +567,24 @@ static void *encode_thr_fn(void *data)
     
     struct timeval tv1, tv2, res;
     
-    switch (tApiHvcInitParam[eCh].eLevel)
+    switch (tApiInitParam[eCh].eLevel)
     {
-        case API_HVC_HEVC_LEVEL_40:
+        case API_VENC_HEVC_LEVEL_40:
         {
             str_level = "L4.0";
             break;
         }       
-        case API_HVC_HEVC_LEVEL_41:
+        case API_VENC_HEVC_LEVEL_41:
         {
             str_level = "L4.1";
             break;
         }        
-        case API_HVC_HEVC_LEVEL_50:
+        case API_VENC_HEVC_LEVEL_50:
         {
             str_level = "L5.0";
             break;
         }        
-        case API_HVC_HEVC_LEVEL_51:
+        case API_VENC_HEVC_LEVEL_51:
         {
             str_level = "L5.1";
             break;
@@ -597,82 +598,82 @@ static void *encode_thr_fn(void *data)
     LOG("Level: %s\n", str_level);
 
     
-    char *str_tier = (tApiHvcInitParam[eCh].eTier == API_HVC_HEVC_MAIN_TIER) ? "Main Tier" : "High Tier";
+    char *str_tier = (tApiInitParam[eCh].eTier == API_VENC_HEVC_MAIN_TIER) ? "Main Tier" : "High Tier";
     
     LOG("Tier: %s\n", str_tier);
     
 
     char *str_res = "Unknown";
     
-    switch (tApiHvcInitParam[eCh].eResolution)
+    switch (tApiInitParam[eCh].eResolution)
     {
-        case API_HVC_RESOLUTION_4096x2160:
+        case API_VENC_RESOLUTION_4096x2160:
         {
             str_res = RESOLUTION_DCI_4K_TEXT;
 
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropTop       = 0;
+            tApiInitParam[eCh].tCrop.u32CropBottom    = 0;
             
             break;
         }
-        case API_HVC_RESOLUTION_3840x2160:
+        case API_VENC_RESOLUTION_3840x2160:
         {
             str_res = RESOLUTION_4K_TEXT;
 
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropTop       = 0;
+            tApiInitParam[eCh].tCrop.u32CropBottom    = 0;
             
             break;
         }        
-        case API_HVC_RESOLUTION_1920x1080:
+        case API_VENC_RESOLUTION_1920x1080:
         {
             str_res = RESOLUTION_2K_TEXT;
 
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 8;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropTop       = 0;
+            tApiInitParam[eCh].tCrop.u32CropBottom    = 8;
             
             break;
         }        
-        case API_HVC_RESOLUTION_1280x720:
+        case API_VENC_RESOLUTION_1280x720:
         {
             str_res = RESOLUTION_HD_TEXT;
 
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropTop       = 0;
+            tApiInitParam[eCh].tCrop.u32CropBottom    = 0;
             
             break;
         }        
-        case API_HVC_RESOLUTION_720x576:
+        case API_VENC_RESOLUTION_720x576:
         {
             str_res = RESOLUTION_SD_576_TEXT;
             
-            tApiHvcInitParam[eCh].eAspectRatioIdc = API_HVC_HEVC_ASPECT_RATIO_IDC_4;
+            tApiInitParam[eCh].eAspectRatioIdc = API_VENC_HEVC_ASPECT_RATIO_IDC_4;
 
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropTop       = 0;
+            tApiInitParam[eCh].tCrop.u32CropBottom    = 0;
             
             break;
         }   
-        case API_HVC_RESOLUTION_720x480:
+        case API_VENC_RESOLUTION_720x480:
         {
             str_res = RESOLUTION_SD_480_TEXT;
 
-            tApiHvcInitParam[eCh].eAspectRatioIdc = API_HVC_HEVC_ASPECT_RATIO_IDC_5;
+            tApiInitParam[eCh].eAspectRatioIdc = API_VENC_HEVC_ASPECT_RATIO_IDC_5;
             
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropLeft      = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropTop       = 0;
-            tApiHvcInitParam[eCh].tCrop.u32CropBottom    = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropLeft      = 0;
+            tApiInitParam[eCh].tCrop.u32CropTop       = 0;
+            tApiInitParam[eCh].tCrop.u32CropBottom    = 0;
             
             break;
         }  
@@ -686,39 +687,39 @@ static void *encode_thr_fn(void *data)
 
     char *str_framerate = "Unknown";
     
-    switch (tApiHvcInitParam[eCh].eTargetFrameRate)
+    switch (tApiInitParam[eCh].eTargetFrameRate)
     {
-        case API_HVC_FPS_24:
+        case API_VENC_FPS_24:
         {
             str_framerate = "24p";
             break;
         }        
-        case API_HVC_FPS_25:
+        case API_VENC_FPS_25:
         {
             str_framerate = "25p";
             break;
         } 
-        case API_HVC_FPS_29_97:
+        case API_VENC_FPS_29_97:
         {
             str_framerate = "29.97p";
             break;
         } 
-        case API_HVC_FPS_30:
+        case API_VENC_FPS_30:
         {
             str_framerate = "30p";
             break;
         }
-        case API_HVC_FPS_50:
+        case API_VENC_FPS_50:
         {
             str_framerate = "50p";
             break;
         }        
-        case API_HVC_FPS_59_94:
+        case API_VENC_FPS_59_94:
         {
             str_framerate = "59.94p";
             break;
         }
-        case API_HVC_FPS_60:
+        case API_VENC_FPS_60:
         {
             str_framerate = "60p";
             break;
@@ -738,19 +739,19 @@ static void *encode_thr_fn(void *data)
     
     LOG("Bitrate %d kbps\n", bitrate_val);
     
-    tApiHvcInitParam[eCh].u32Bitrate = bitrate_val;
+    tApiInitParam[eCh].u32Bitrate = bitrate_val;
 
 
     char *str_bitdepth = "Unknown";
     
-    switch (tApiHvcInitParam[eCh].eBitDepth)
+    switch (tApiInitParam[eCh].eBitDepth)
     {
-        case API_HVC_BIT_DEPTH_8:
+        case API_VENC_BIT_DEPTH_8:
         {
             str_bitdepth = "8";
             break;
         }        
-        case API_HVC_BIT_DEPTH_10:
+        case API_VENC_BIT_DEPTH_10:
         {
             str_bitdepth = "10";
             break;
@@ -764,14 +765,14 @@ static void *encode_thr_fn(void *data)
     LOG("bit depth: %s\n", str_bitdepth);
     
     
-    char *str_chroma = (tApiHvcInitParam[eCh].eChromaFmt == API_HVC_CHROMA_FORMAT_420) ? "420" : "422";
+    char *str_chroma = (tApiInitParam[eCh].eChromaFmt == API_VENC_CHROMA_FORMAT_420) ? "420" : "422";
     
     LOG("Chroma: %s\n", str_chroma);
 
     {
         GSList *list; 
         GtkToggleButton *button = NULL;
-        API_HVC_IMG_T *pImg = &img[eCh];
+        API_VENC_IMG_T *pImg = &img[eCh];
         
         list = gtk_radio_button_get_group(GTK_RADIO_BUTTON(PixFmtIntRadioButton[eCh]));
         
@@ -790,24 +791,24 @@ static void *encode_thr_fn(void *data)
         
         if (strcmp(val, PIXEL_FMT_INTERLEAVE_TEXT) == 0)
         {
-            switch (tApiHvcInitParam[eCh].eChromaFmt)
+            switch (tApiInitParam[eCh].eChromaFmt)
             {
-                case API_HVC_CHROMA_FORMAT_422:
+                case API_VENC_CHROMA_FORMAT_422:
                 {
-                    pImg->eFormat = API_HVC_IMAGE_FORMAT_NV16;
+                    pImg->eFormat = API_VENC_IMAGE_FORMAT_NV16;
                     break;
                 }
-                case API_HVC_CHROMA_FORMAT_420:
+                case API_VENC_CHROMA_FORMAT_420:
                 default:
                 {
-                    pImg->eFormat = API_HVC_IMAGE_FORMAT_NV12;
+                    pImg->eFormat = API_VENC_IMAGE_FORMAT_NV12;
                     break;
                 }
             }
         }
         else if (strcmp(val, PIXEL_FMT_PLANAR_TEXT) == 0)
         {
-            pImg->eFormat = API_HVC_IMAGE_FORMAT_YUV420;
+            pImg->eFormat = API_VENC_IMAGE_FORMAT_YUV420;
         }
         
         LOG("%s: %s selected\n", __FUNCTION__, val);
@@ -815,24 +816,24 @@ static void *encode_thr_fn(void *data)
     
     char *str_gop = "Unknown";
 
-    switch (tApiHvcInitParam[eCh].eGopType)
+    switch (tApiInitParam[eCh].eGopType)
     {
-        case API_HVC_GOP_I:
+        case API_VENC_GOP_I:
         {
             str_gop = "I";
             break;
         }
-        case API_HVC_GOP_IP:
+        case API_VENC_GOP_IP:
         {
             str_gop = "IP";
             break;
         }
-        case API_HVC_GOP_IB:
+        case API_VENC_GOP_IB:
         {
             str_gop = "IB";
             break;
         }
-        case API_HVC_GOP_IPB:
+        case API_VENC_GOP_IPB:
         {
             str_gop = "IPB";
             break;
@@ -845,42 +846,40 @@ static void *encode_thr_fn(void *data)
     
     LOG("GOP: %s\n", str_gop);
 
-    if (tApiHvcInitParam[eCh].eGopType != API_HVC_GOP_I)
+    if (tApiInitParam[eCh].eGopType != API_VENC_GOP_I)
     {
-        tApiHvcInitParam[eCh].eGopSize = atoi(gtk_entry_get_text(GTK_ENTRY(GopSizeEntry[eCh])));
+        tApiInitParam[eCh].eGopSize = atoi(gtk_entry_get_text(GTK_ENTRY(GopSizeEntry[eCh])));
     }
 
-    LOG("GOP size=%d\n", tApiHvcInitParam[eCh].eGopSize);
+    LOG("GOP size=%d\n", tApiInitParam[eCh].eGopSize);
 
-    if (tApiHvcInitParam[eCh].eGopType != API_HVC_GOP_I)
+    if (tApiInitParam[eCh].eGopType != API_VENC_GOP_I)
     {
-        tApiHvcInitParam[eCh].eIDRFrameNum = atoi(gtk_entry_get_text(GTK_ENTRY(IdrIntervalEntry[eCh])));
+        tApiInitParam[eCh].eIDRFrameNum = atoi(gtk_entry_get_text(GTK_ENTRY(IdrIntervalEntry[eCh])));
     }
 
-    LOG("IDR interval=%d\n", tApiHvcInitParam[eCh].eIDRFrameNum);
+    LOG("IDR interval=%d\n", tApiInitParam[eCh].eIDRFrameNum);
     
 
-    if ((tApiHvcInitParam[eCh].eGopType == API_HVC_GOP_IB)
-       || (tApiHvcInitParam[eCh].eGopType == API_HVC_GOP_IPB))
+    if ((tApiInitParam[eCh].eGopType == API_VENC_GOP_IB)
+       || (tApiInitParam[eCh].eGopType == API_VENC_GOP_IPB))
     {
         guint refnum;
     
         refnum = gtk_range_get_value(GTK_RANGE(BNumScale[eCh]));
         
-        tApiHvcInitParam[eCh].eBFrameNum = (API_HVC_B_FRAME_NUM_E) refnum;
+        tApiInitParam[eCh].eBFrameNum = (API_VENC_B_FRAME_NUM_E) refnum;
 
         LOG("B ref#=%u\n", refnum);
     }
 
-    tApiHvcInitParam[eCh].tCoding.bDisableAMP = true;
-    
 
-    API_HVC_BOARD_E eBoard = API_HVC_BOARD_1;
+    API_VENC_BOARD_E eBoard = API_VENC_BOARD_1;
 
     eCh = param->eCh;
     
     gettimeofday(&tv1, NULL);
-    if (HVC_ENC_Init(eBoard, eCh, &tApiHvcInitParam[eCh]))
+    if (Api_VENC_Init(eBoard, eCh, &tApiInitParam[eCh]))
     {
         sprintf(err_msg, "%s line %d failed!", __FILE__, __LINE__);
 
@@ -891,7 +890,7 @@ static void *encode_thr_fn(void *data)
 
     tPopEsArgs[eBoard][eCh].board_num = eBoard;
     tPopEsArgs[eBoard][eCh].channel   = eCh;
-    if (HVC_ENC_RegisterCallback
+    if (Api_VENC_RegisterCallback
         (
             eBoard,
             eCh,
@@ -905,7 +904,7 @@ static void *encode_thr_fn(void *data)
     }
 
 
-    if (HVC_ENC_Start(eBoard, eCh))
+    if (Api_VENC_Start(eBoard, eCh))
     {
         sprintf(err_msg, "%s line %d failed!", __FILE__, __LINE__);
 
@@ -932,14 +931,14 @@ static void *encode_thr_fn(void *data)
 
     fstat(fd_r[eCh], &file_stat);
 
-    frame_sz = calculate_vraw_enqueue_data_size(&tApiHvcInitParam[eCh]);
+    frame_sz = calculate_vraw_enqueue_data_size(&tApiInitParam[eCh]);
     remain_frame = ((uint64_t) file_stat.st_size / frame_sz);
     tPopEsArgs[eBoard][eCh].total_frame = remain_frame;
     tPopEsArgs[eBoard][eCh].poped_frame = 0;
     
     vraw_data_buf_p = malloc(frame_sz);
 
-    API_HVC_IMG_T *pImg = &img[eCh];
+    API_VENC_IMG_T *pImg = &img[eCh];
 
     while (remain_frame > 0)
     {        
@@ -952,7 +951,7 @@ static void *encode_thr_fn(void *data)
         pImg->pts         = GET_PTS_IN_MS(eCh, tPopEsArgs[eBoard][eCh].total_frame - remain_frame);
         pImg->bLastFrame  = (remain_frame == 0) ? true : false;
 
-        if (HVC_ENC_PushImage(eBoard, eCh, pImg))
+        if (Api_VENC_PushImage(eBoard, eCh, pImg))
         {
             sprintf(err_msg, "Error: %s PushImage failed!\n", __FILE__);
 
@@ -963,13 +962,13 @@ static void *encode_thr_fn(void *data)
     LOG("Encode done...\n");
 
     // try stop
-    while (HVC_ENC_Stop(eBoard, eCh))
+    while (Api_VENC_Stop(eBoard, eCh))
     {
         usleep(1);
     }
     LOG("\n stop complete!\n");
 
-    if (HVC_ENC_Exit(eBoard, eCh))
+    if (Api_VENC_Exit(eBoard, eCh))
     {
         LOG(err_msg, "%s line %d failed!", __FILE__, __LINE__);
 

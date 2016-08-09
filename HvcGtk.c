@@ -17,8 +17,8 @@
 #include <fcntl.h>
 
 
-#include "libhvc_venc/inc/HVC_types.h"
-#include "libhvc_venc/inc/HVC_encoder.h"
+#include "apiVENC_types.h"
+#include "apiVENC.h"
 #include "HvcGtk.h"
 #include "handler.h"
 
@@ -30,9 +30,9 @@
 FILE *ui_logging;
 char err_msg[FILENAME_MAX];
 
-gchar *FilenameRawYUV[API_HVC_CHN_MAX];
-int fd_r[API_HVC_CHN_MAX];
-int fd_w[API_HVC_CHN_MAX];
+gchar *FilenameRawYUV[API_VENC_CHN_MAX];
+int fd_r[API_VENC_CHN_MAX];
+int fd_w[API_VENC_CHN_MAX];
 
 
 GtkWidget *window;
@@ -40,70 +40,70 @@ GtkNotebook *notebook;
 GtkWidget *Label1;
 GtkWidget *Label2;
 GtkWidget *Label3;
-GtkGrid   *GridCh[API_HVC_CHN_MAX];
+GtkGrid   *GridCh[API_VENC_CHN_MAX];
 GtkGrid   *GridAbout;
 
-GtkWidget *ProfileLabel[API_HVC_CHN_MAX];
-GtkWidget *ProfileMainRadioButton[API_HVC_CHN_MAX];
-GtkWidget *ProfileMain10RadioButton[API_HVC_CHN_MAX];
-GtkWidget *ProfileBox[API_HVC_CHN_MAX];
+GtkWidget *ProfileLabel[API_VENC_CHN_MAX];
+GtkWidget *ProfileMainRadioButton[API_VENC_CHN_MAX];
+GtkWidget *ProfileMain10RadioButton[API_VENC_CHN_MAX];
+GtkWidget *ProfileBox[API_VENC_CHN_MAX];
 
-GtkWidget *LvLabel[API_HVC_CHN_MAX];
-GtkWidget *Lv40RadioButton[API_HVC_CHN_MAX];
-GtkWidget *Lv41RadioButton[API_HVC_CHN_MAX];
-GtkWidget *Lv50RadioButton[API_HVC_CHN_MAX];
-GtkWidget *Lv51RadioButton[API_HVC_CHN_MAX];
-GtkWidget *LvBox[API_HVC_CHN_MAX];
+GtkWidget *LvLabel[API_VENC_CHN_MAX];
+GtkWidget *Lv40RadioButton[API_VENC_CHN_MAX];
+GtkWidget *Lv41RadioButton[API_VENC_CHN_MAX];
+GtkWidget *Lv50RadioButton[API_VENC_CHN_MAX];
+GtkWidget *Lv51RadioButton[API_VENC_CHN_MAX];
+GtkWidget *LvBox[API_VENC_CHN_MAX];
 
-GtkWidget *TierLabel[API_HVC_CHN_MAX];
-GtkWidget *TierMainRadioButton[API_HVC_CHN_MAX];
-GtkWidget *TierHighRadioButton[API_HVC_CHN_MAX];
-GtkWidget *TierBox[API_HVC_CHN_MAX];
+GtkWidget *TierLabel[API_VENC_CHN_MAX];
+GtkWidget *TierMainRadioButton[API_VENC_CHN_MAX];
+GtkWidget *TierHighRadioButton[API_VENC_CHN_MAX];
+GtkWidget *TierBox[API_VENC_CHN_MAX];
 
-GtkWidget *ResLabel[API_HVC_CHN_MAX];
-GtkComboBoxText *ResCombo[API_HVC_CHN_MAX];
+GtkWidget *ResLabel[API_VENC_CHN_MAX];
+GtkComboBoxText *ResCombo[API_VENC_CHN_MAX];
 
-GtkWidget *FpsLabel[API_HVC_CHN_MAX];
-GtkComboBoxText *FpsCombo[API_HVC_CHN_MAX];
+GtkWidget *FpsLabel[API_VENC_CHN_MAX];
+GtkComboBoxText *FpsCombo[API_VENC_CHN_MAX];
 
-GtkWidget *BitrateLabel[API_HVC_CHN_MAX];
-GtkWidget *Bitrate[API_HVC_CHN_MAX];
+GtkWidget *BitrateLabel[API_VENC_CHN_MAX];
+GtkWidget *Bitrate[API_VENC_CHN_MAX];
 
-GtkWidget *BitdepthLabel[API_HVC_CHN_MAX];
-GtkWidget *Bitdepth8RadioButton[API_HVC_CHN_MAX];
-GtkWidget *Bitdepth10RadioButton[API_HVC_CHN_MAX];
-GtkWidget *BitdepthBox[API_HVC_CHN_MAX];
+GtkWidget *BitdepthLabel[API_VENC_CHN_MAX];
+GtkWidget *Bitdepth8RadioButton[API_VENC_CHN_MAX];
+GtkWidget *Bitdepth10RadioButton[API_VENC_CHN_MAX];
+GtkWidget *BitdepthBox[API_VENC_CHN_MAX];
 
-GtkWidget *ChromaLabel[API_HVC_CHN_MAX];
-GtkWidget *Chroma420RadioButton[API_HVC_CHN_MAX];
-GtkWidget *Chroma422RadioButton[API_HVC_CHN_MAX];
-GtkWidget *ChromaBox[API_HVC_CHN_MAX];
+GtkWidget *ChromaLabel[API_VENC_CHN_MAX];
+GtkWidget *Chroma420RadioButton[API_VENC_CHN_MAX];
+GtkWidget *Chroma422RadioButton[API_VENC_CHN_MAX];
+GtkWidget *ChromaBox[API_VENC_CHN_MAX];
 
-GtkWidget *PixFmtLabel[API_HVC_CHN_MAX];
-GtkWidget *PixFmtIntRadioButton[API_HVC_CHN_MAX];
-GtkWidget *PixFmtPlaRadioButton[API_HVC_CHN_MAX];
-GtkWidget *PixFmtBox[API_HVC_CHN_MAX];
+GtkWidget *PixFmtLabel[API_VENC_CHN_MAX];
+GtkWidget *PixFmtIntRadioButton[API_VENC_CHN_MAX];
+GtkWidget *PixFmtPlaRadioButton[API_VENC_CHN_MAX];
+GtkWidget *PixFmtBox[API_VENC_CHN_MAX];
 
-GtkWidget *GopLabel[API_HVC_CHN_MAX];
-GtkWidget *GopIbRadioButton[API_HVC_CHN_MAX];
-GtkWidget *GopIpRadioButton[API_HVC_CHN_MAX];
-GtkWidget *GopIpbRadioButton[API_HVC_CHN_MAX];
-GtkWidget *GopIRadioButton[API_HVC_CHN_MAX];
-GtkWidget *GopBox[API_HVC_CHN_MAX];
+GtkWidget *GopLabel[API_VENC_CHN_MAX];
+GtkWidget *GopIbRadioButton[API_VENC_CHN_MAX];
+GtkWidget *GopIpRadioButton[API_VENC_CHN_MAX];
+GtkWidget *GopIpbRadioButton[API_VENC_CHN_MAX];
+GtkWidget *GopIRadioButton[API_VENC_CHN_MAX];
+GtkWidget *GopBox[API_VENC_CHN_MAX];
 
-GtkWidget *GopSizeLabel[API_HVC_CHN_MAX];
-GtkWidget *GopSizeEntry[API_HVC_CHN_MAX];
+GtkWidget *GopSizeLabel[API_VENC_CHN_MAX];
+GtkWidget *GopSizeEntry[API_VENC_CHN_MAX];
 
-GtkWidget *IdrIntervalLabel[API_HVC_CHN_MAX];
-GtkWidget *IdrIntervalEntry[API_HVC_CHN_MAX];
+GtkWidget *IdrIntervalLabel[API_VENC_CHN_MAX];
+GtkWidget *IdrIntervalEntry[API_VENC_CHN_MAX];
 
-GtkWidget *BNumLabel[API_HVC_CHN_MAX];
-GtkWidget *BNumScale[API_HVC_CHN_MAX];
+GtkWidget *BNumLabel[API_VENC_CHN_MAX];
+GtkWidget *BNumScale[API_VENC_CHN_MAX];
 
 
-GtkWidget *OpenButton[API_HVC_CHN_MAX];
-GtkWidget *EncodeButton[API_HVC_CHN_MAX];
-GtkWidget *ProgressBar[API_HVC_CHN_MAX];
+GtkWidget *OpenButton[API_VENC_CHN_MAX];
+GtkWidget *EncodeButton[API_VENC_CHN_MAX];
+GtkWidget *ProgressBar[API_VENC_CHN_MAX];
 
 GtkWidget *CopyRight;
 GtkWidget *ApiLabel;
@@ -120,65 +120,65 @@ GtkWidget *FwMultiLabel;
 GtkWidget *FwMultiVersion;
 
 
-POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_HVC_BOARD_MAX][API_HVC_CHN_MAX];
-static ENCODE_CALLBACK_PARAM_T tEncodeParam[API_HVC_CHN_MAX];
-static OPEN_CALLBACK_PARAM_T   tOpenParam[API_HVC_CHN_MAX];
+POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_VENC_BOARD_MAX][API_VENC_CHN_MAX];
+static ENCODE_CALLBACK_PARAM_T tEncodeParam[API_VENC_CHN_MAX];
+static OPEN_CALLBACK_PARAM_T   tOpenParam[API_VENC_CHN_MAX];
 
 
-static API_HVC_CHN_E eCh1 = API_HVC_CHN_1;
-static API_HVC_CHN_E eCh2 = API_HVC_CHN_2;
-static API_HVC_CHN_E eCh3 = API_HVC_CHN_3;
-static API_HVC_CHN_E eCh4 = API_HVC_CHN_4;
+static API_VENC_CHN_E eCh1 = API_VENC_CHN_1;
+static API_VENC_CHN_E eCh2 = API_VENC_CHN_2;
+static API_VENC_CHN_E eCh3 = API_VENC_CHN_3;
+static API_VENC_CHN_E eCh4 = API_VENC_CHN_4;
 
-API_HVC_INIT_PARAM_T tApiHvcInitParam[API_HVC_CHN_MAX] =
+API_VENC_INIT_PARAM_T tApiInitParam[API_VENC_CHN_MAX] =
 {
     {
-        .eInputMode     = API_HVC_INPUT_MODE_DATA,
-        .eProfile       = API_HVC_HEVC_MAIN_PROFILE,
-        .eLevel         = API_HVC_HEVC_LEVEL_40,
-        .eTier          = API_HVC_HEVC_MAIN_TIER,
+        .eInputMode     = API_VENC_INPUT_MODE_DATA,
+        .eProfile       = API_VENC_HEVC_MAIN_PROFILE,
+        .eLevel         = API_VENC_HEVC_LEVEL_40,
+        .eTier          = API_VENC_HEVC_MAIN_TIER,
         
-        .eResolution    = API_HVC_RESOLUTION_4096x2160,
-        .eChromaFmt     = API_HVC_CHROMA_FORMAT_420,
-        .eBitDepth      = API_HVC_BIT_DEPTH_8,
+        .eResolution    = API_VENC_RESOLUTION_4096x2160,
+        .eChromaFmt     = API_VENC_CHROMA_FORMAT_420,
+        .eBitDepth      = API_VENC_BIT_DEPTH_8,
 
-        .eGopType       = API_HVC_GOP_IB,
-        .eGopSize       = API_HVC_GOP_SIZE_64,
-        .eBFrameNum     = API_HVC_B_FRAME_ONE,
+        .eGopType       = API_VENC_GOP_IB,
+        .eGopSize       = API_VENC_GOP_SIZE_64,
+        .eBFrameNum     = API_VENC_B_FRAME_ONE,
         
-        .eTargetFrameRate = API_HVC_FPS_24,
+        .eTargetFrameRate = API_VENC_FPS_24,
         .u32Bitrate     = 32000,
         
-        .eDbgLevel = API_HVC_DBG_LEVEL_0,
+        .eDbgLevel = API_VENC_DBG_LEVEL_0,
     },
     {
-        .eInputMode     = API_HVC_INPUT_MODE_DATA,
-        .eProfile       = API_HVC_HEVC_MAIN_PROFILE,
-        .eLevel         = API_HVC_HEVC_LEVEL_40,
-        .eTier          = API_HVC_HEVC_MAIN_TIER,
+        .eInputMode     = API_VENC_INPUT_MODE_DATA,
+        .eProfile       = API_VENC_HEVC_MAIN_PROFILE,
+        .eLevel         = API_VENC_HEVC_LEVEL_40,
+        .eTier          = API_VENC_HEVC_MAIN_TIER,
         
-        .eResolution    = API_HVC_RESOLUTION_1920x1080,
-        .eChromaFmt     = API_HVC_CHROMA_FORMAT_420,
-        .eBitDepth      = API_HVC_BIT_DEPTH_8,
+        .eResolution    = API_VENC_RESOLUTION_1920x1080,
+        .eChromaFmt     = API_VENC_CHROMA_FORMAT_420,
+        .eBitDepth      = API_VENC_BIT_DEPTH_8,
 
-        .eGopType       = API_HVC_GOP_IB,
-        .eGopSize       = API_HVC_GOP_SIZE_64,
-        .eBFrameNum     = API_HVC_B_FRAME_ONE,
+        .eGopType       = API_VENC_GOP_IB,
+        .eGopSize       = API_VENC_GOP_SIZE_64,
+        .eBFrameNum     = API_VENC_B_FRAME_ONE,
         
-        .eTargetFrameRate = API_HVC_FPS_24,
+        .eTargetFrameRate = API_VENC_FPS_24,
         .u32Bitrate     = 32000,
         
-        .eDbgLevel = API_HVC_DBG_LEVEL_0,
+        .eDbgLevel = API_VENC_DBG_LEVEL_0,
     },
 };
 
 /// Function Prototype
-static void draw_profile(API_HVC_CHN_E *);
-static void draw_level(API_HVC_CHN_E *);
-static void draw_tier(API_HVC_CHN_E *);
-static void draw_res(API_HVC_CHN_E *);
-static void draw_framerate(API_HVC_CHN_E *);
-static void draw_bitrate(API_HVC_CHN_E *);
+static void draw_profile(API_VENC_CHN_E *);
+static void draw_level(API_VENC_CHN_E *);
+static void draw_tier(API_VENC_CHN_E *);
+static void draw_res(API_VENC_CHN_E *);
+static void draw_framerate(API_VENC_CHN_E *);
+static void draw_bitrate(API_VENC_CHN_E *);
 static void draw_bitdepth();
 static void draw_chroma();
 static void draw_pixfmt();
@@ -188,9 +188,9 @@ static void draw_idr_interval();
 static void draw_b_frame_num();
 
 
-static void draw_profile(API_HVC_CHN_E *pCh)
+static void draw_profile(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // Profile field
     ProfileLabel[eCh]               = gtk_label_new("Profile: ");
@@ -222,9 +222,9 @@ static void draw_profile(API_HVC_CHN_E *pCh)
 }
 
 
-static void draw_level(API_HVC_CHN_E *pCh)
+static void draw_level(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // Level field
     LvLabel[eCh] = gtk_label_new("Level: ");
@@ -262,9 +262,9 @@ static void draw_level(API_HVC_CHN_E *pCh)
 }
 
 
-static void draw_tier(API_HVC_CHN_E *pCh)
+static void draw_tier(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // Tier field
     TierLabel[eCh] = gtk_label_new ("Tier: ");
@@ -295,15 +295,15 @@ static void draw_tier(API_HVC_CHN_E *pCh)
     );    
 }
 
-static void draw_res(API_HVC_CHN_E *pCh)
+static void draw_res(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // Resolution field
     ResLabel[eCh] = gtk_label_new("Resolution: ");
     ResCombo[eCh] = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
 
-    if (eCh == API_HVC_CHN_1)
+    if (eCh == API_VENC_CHN_1)
     {
         gtk_combo_box_text_append_text
         (
@@ -357,9 +357,9 @@ static void draw_res(API_HVC_CHN_E *pCh)
     );    
 }
 
-static void draw_framerate(API_HVC_CHN_E *pCh)
+static void draw_framerate(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     FpsLabel[eCh] = gtk_label_new("Frame Rate: ");
     FpsCombo[eCh] = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
@@ -420,9 +420,9 @@ static void draw_framerate(API_HVC_CHN_E *pCh)
     );
 }
 
-static void draw_bitrate(API_HVC_CHN_E *pCh)
+static void draw_bitrate(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // Bitrate field
     BitrateLabel[eCh] = gtk_label_new("Bitrate (kbps): ");
@@ -444,9 +444,9 @@ static void draw_bitrate(API_HVC_CHN_E *pCh)
     );
 }
 
-static void draw_bitdepth(API_HVC_CHN_E *pCh)
+static void draw_bitdepth(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // Bitdepth field
     BitdepthLabel[eCh] = gtk_label_new ("Bitdepth: ");
@@ -477,9 +477,9 @@ static void draw_bitdepth(API_HVC_CHN_E *pCh)
     );     
 }
 
-static void draw_chroma(API_HVC_CHN_E *pCh)
+static void draw_chroma(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // Chroma field
     ChromaLabel[eCh] = gtk_label_new("Chroma: ");
@@ -510,9 +510,9 @@ static void draw_chroma(API_HVC_CHN_E *pCh)
     );
 }
 
-static void draw_pixfmt(API_HVC_CHN_E *pCh)
+static void draw_pixfmt(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // Pixel format field
     PixFmtLabel[eCh] = gtk_label_new("Pixel Fmt: ");
@@ -543,9 +543,9 @@ static void draw_pixfmt(API_HVC_CHN_E *pCh)
     );
 }
 
-static void draw_gop(API_HVC_CHN_E *pCh)
+static void draw_gop(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // GOP field
     GopLabel[eCh] = gtk_label_new("GOP: ");
@@ -582,9 +582,9 @@ static void draw_gop(API_HVC_CHN_E *pCh)
     ); 
 }
 
-static void draw_gop_size(API_HVC_CHN_E *pCh)
+static void draw_gop_size(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     GopSizeLabel[eCh] = gtk_label_new("GOP Size: ");
     GopSizeEntry[eCh] = gtk_entry_new();
@@ -607,9 +607,9 @@ static void draw_gop_size(API_HVC_CHN_E *pCh)
     );     
 }
 
-static void draw_idr_interval(API_HVC_CHN_E *pCh)
+static void draw_idr_interval(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     IdrIntervalLabel[eCh] = gtk_label_new("IDR Interval: ");
     IdrIntervalEntry[eCh] = gtk_entry_new();
@@ -632,9 +632,9 @@ static void draw_idr_interval(API_HVC_CHN_E *pCh)
     );     
 }
 
-static void draw_b_frame_num(API_HVC_CHN_E *pCh)
+static void draw_b_frame_num(API_VENC_CHN_E *pCh)
 {
-    API_HVC_CHN_E eCh = *pCh;
+    API_VENC_CHN_E eCh = *pCh;
 
     // Ref frame number
     BNumLabel[eCh] = gtk_label_new("B frame #: ");
@@ -656,7 +656,7 @@ static void draw_b_frame_num(API_HVC_CHN_E *pCh)
     ); 
 }
 
-static void draw_run(API_HVC_CHN_E eCh)
+static void draw_run(API_VENC_CHN_E eCh)
 {
     EncodeButton[eCh] = gtk_button_new_with_label("Run");
 
@@ -673,7 +673,7 @@ static void draw_run(API_HVC_CHN_E eCh)
     );
 }
 
-static void draw_open(GtkWidget *window, API_HVC_CHN_E eCh)
+static void draw_open(GtkWidget *window, API_VENC_CHN_E eCh)
 {
     OpenButton[eCh] = gtk_button_new_with_label("Open ...");
 
@@ -691,7 +691,7 @@ static void draw_open(GtkWidget *window, API_HVC_CHN_E eCh)
     );
 }
 
-static void draw_bar(API_HVC_CHN_E eCh)
+static void draw_bar(API_VENC_CHN_E eCh)
 {    
     ProgressBar[eCh] = gtk_progress_bar_new();
 
@@ -713,7 +713,7 @@ int main(int argc, char *argv[])
  
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-    gtk_window_set_title(GTK_WINDOW(window), "HVC-8700");
+    gtk_window_set_title(GTK_WINDOW(window), "VEGA-330X");
     gtk_container_set_border_width(GTK_CONTAINER(window), 10);
     gtk_widget_set_size_request(window, 150, 100);
 
@@ -774,10 +774,10 @@ int main(int argc, char *argv[])
     FwSingleLabel = gtk_label_new("Single FW version:");
     FwMultiLabel = gtk_label_new("Multi FW version:");
 
-    API_HVC_VERSION_INFO_T t_ver;
+    API_VENC_VERSION_INFO_T t_ver;
 
     memset(&t_ver, 0, sizeof(t_ver));
-    HVC_ENC_GetVersion(0, &t_ver);
+    Api_VENC_GetVersion(0, &t_ver);
     char str_api_ver[255];
     sprintf(str_api_ver, "%d.%d.%d.%d", 
         t_ver.u32KernelVer, t_ver.u32MajorVer, t_ver.u32MinorVer, t_ver.u32SvnVer);
