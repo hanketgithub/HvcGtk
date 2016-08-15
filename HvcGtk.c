@@ -40,8 +40,9 @@ GtkNotebook *notebook;
 GtkWidget *Label1;
 GtkWidget *Label2;
 GtkWidget *Label3;
-GtkGrid   *GridCh[API_VENC_CHN_MAX];
-GtkGrid   *GridAbout;
+GtkGrid   *g_grid_master;
+GtkGrid   *g_grid_channel[API_VENC_CHN_MAX];
+GtkGrid   *g_grid_about;
 
 GtkWidget *ProfileLabel[API_VENC_CHN_MAX];
 GtkWidget *ProfileMainRadioButton[API_VENC_CHN_MAX];
@@ -103,7 +104,11 @@ GtkWidget *BNumScale[API_VENC_CHN_MAX];
 
 GtkWidget *OpenButton[API_VENC_CHN_MAX];
 GtkWidget *EncodeButton[API_VENC_CHN_MAX];
-GtkWidget *ProgressBar[API_VENC_CHN_MAX];
+GtkWidget *progressbar[API_VENC_CHN_MAX];
+GtkWidget *statusbar;
+guint context_id;
+
+
 
 GtkWidget *CopyRight;
 GtkWidget *ApiLabel;
@@ -208,14 +213,14 @@ static void draw_profile(API_VENC_CHN_E *pCh)
     // Attatch profile
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         ProfileLabel[eCh],
         0, GRID_ORDER_PROFILE, 1, 1
     );
     
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         ProfileBox[eCh],
         1, GRID_ORDER_PROFILE, 1, 1
     );    
@@ -248,14 +253,14 @@ static void draw_level(API_VENC_CHN_E *pCh)
     // Attatch level
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         LvLabel[eCh],
         0, GRID_ORDER_LEVEL, 1, 1
     );
 
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         LvBox[eCh],
         1, GRID_ORDER_LEVEL, 1, 1
     );    
@@ -282,14 +287,14 @@ static void draw_tier(API_VENC_CHN_E *pCh)
     // Attatch tier
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         TierLabel[eCh],
         0, GRID_ORDER_TIER, 1, 1
     );
 
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         TierBox[eCh],
         1, GRID_ORDER_TIER, 1, 1
     );    
@@ -344,14 +349,14 @@ static void draw_res(API_VENC_CHN_E *pCh)
     // Attatch resolution
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         ResLabel[eCh],
         0, GRID_ORDER_RESOLUTION, 1, 1
     );
     
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         GTK_WIDGET(ResCombo[eCh]),
         1, GRID_ORDER_RESOLUTION, 1, 1
     );    
@@ -407,14 +412,14 @@ static void draw_framerate(API_VENC_CHN_E *pCh)
     // Attatch framerate
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         FpsLabel[eCh],
         0, GRID_ORDER_FRAMERATE, 1, 1
     );
 
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         GTK_WIDGET(FpsCombo[eCh]),
         1, GRID_ORDER_FRAMERATE, 1, 1
     );
@@ -431,14 +436,14 @@ static void draw_bitrate(API_VENC_CHN_E *pCh)
     // Attach Bitrate
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         BitrateLabel[eCh],
         0, GRID_ORDER_BITRATE, 1, 1
     );
 
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         Bitrate[eCh],
         1, GRID_ORDER_BITRATE, 1, 1
     );
@@ -464,14 +469,14 @@ static void draw_bitdepth(API_VENC_CHN_E *pCh)
     // Attatch bitdepth
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         BitdepthLabel[eCh],
         0, GRID_ORDER_BITDEPTH, 1, 1
     );
     
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         BitdepthBox[eCh],
         1, GRID_ORDER_BITDEPTH, 1, 1
     );     
@@ -497,14 +502,14 @@ static void draw_chroma(API_VENC_CHN_E *pCh)
     // Attatch chroma
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         ChromaLabel[eCh],
         0, GRID_ORDER_CHROMA, 1, 1
     );
 
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         ChromaBox[eCh],
         1, GRID_ORDER_CHROMA, 1, 1
     );
@@ -530,14 +535,14 @@ static void draw_pixfmt(API_VENC_CHN_E *pCh)
     // Attatch chroma
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         PixFmtLabel[eCh],
         0, GRID_ORDER_PIX_FMT, 1, 1
     );
 
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         PixFmtBox[eCh],
         1, GRID_ORDER_PIX_FMT, 1, 1
     );
@@ -569,14 +574,14 @@ static void draw_gop(API_VENC_CHN_E *pCh)
     // Attatch GOP
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         GopLabel[eCh],
         0, GRID_ORDER_GOP, 1, 1
     );    
 
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         GopBox[eCh],
         1, GRID_ORDER_GOP, 1, 1
     ); 
@@ -594,14 +599,14 @@ static void draw_gop_size(API_VENC_CHN_E *pCh)
     // Attatch GOP size
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         GopSizeLabel[eCh],
         0, GRID_ORDER_GOP_SIZE, 1, 1
     );
     
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         GopSizeEntry[eCh],
         1, GRID_ORDER_GOP_SIZE, 1, 1
     );     
@@ -619,14 +624,14 @@ static void draw_idr_interval(API_VENC_CHN_E *pCh)
     // Attatch GOP size
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         IdrIntervalLabel[eCh],
         0, GRID_ORDER_IDR_INTERVAL, 1, 1
     );
 
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         IdrIntervalEntry[eCh],
         1, GRID_ORDER_IDR_INTERVAL, 1, 1
     );     
@@ -643,14 +648,14 @@ static void draw_b_frame_num(API_VENC_CHN_E *pCh)
     // Attatch ref
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         BNumLabel[eCh],
         0, GRID_ORDER_BNUM, 1, 1
     );
     
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         BNumScale[eCh],
         1, GRID_ORDER_BNUM, 1, 1
     ); 
@@ -667,7 +672,7 @@ static void draw_run(API_VENC_CHN_E eCh)
     // Attach encode
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         EncodeButton[eCh],
         0, GRID_ORDER_ENCODE + eCh * 2, 1, 1
     );
@@ -685,7 +690,7 @@ static void draw_open(GtkWidget *window, API_VENC_CHN_E eCh)
     // Attach open
     gtk_grid_attach
     (
-        GridCh[eCh],
+        g_grid_channel[eCh],
         OpenButton[eCh],
         0, GRID_ORDER_OPEN + eCh * 2, 2, 1
     );
@@ -693,13 +698,13 @@ static void draw_open(GtkWidget *window, API_VENC_CHN_E eCh)
 
 static void draw_bar(API_VENC_CHN_E eCh)
 {    
-    ProgressBar[eCh] = gtk_progress_bar_new();
+    progressbar[eCh] = gtk_progress_bar_new();
 
     // Attach open
     gtk_grid_attach
     (
-        GridCh[eCh],
-        ProgressBar[eCh],
+        g_grid_channel[eCh],
+        progressbar[eCh],
         1, GRID_ORDER_BAR + eCh * 2, 2, 1
     );
 }
@@ -717,15 +722,22 @@ int main(int argc, char *argv[])
     gtk_container_set_border_width(GTK_CONTAINER(window), 10);
     gtk_widget_set_size_request(window, 150, 100);
 
+    g_grid_master = GTK_GRID(gtk_grid_new());
     notebook = GTK_NOTEBOOK(gtk_notebook_new());
 
     Label1  = gtk_label_new("Channel 1");
     Label2  = gtk_label_new("Channel 2");
     Label3  = gtk_label_new("About");
 
-    GridCh[eCh1] = GTK_GRID(gtk_grid_new());
-    GridCh[eCh2] = GTK_GRID(gtk_grid_new());
-    GridAbout    = GTK_GRID(gtk_grid_new());
+    g_grid_channel[eCh1] = GTK_GRID(gtk_grid_new());
+    g_grid_channel[eCh2] = GTK_GRID(gtk_grid_new());
+    g_grid_about    = GTK_GRID(gtk_grid_new());
+
+    statusbar = gtk_statusbar_new();
+    context_id = gtk_statusbar_get_context_id(GTK_STATUSBAR(statusbar), "");
+    context_id = gtk_statusbar_push(GTK_STATUSBAR(statusbar), 
+                         context_id, "Waiting for your first encode task...");
+
 
     // Create Channel 1 panel
     draw_profile(&eCh1);
@@ -793,95 +805,98 @@ int main(int argc, char *argv[])
 
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         CopyRight,
         0, 0, 2, 1
     );    
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         ApiLabel,
         0, 1, 1, 1
     );  
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         ApiVersion,
         1, 1, 1, 1
     ); 
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         DrvLabel,
         0, 2, 1, 1
     );  
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         DrvVersion,
         1, 2, 1, 1
     ); 
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         SysFwLabel,
         0, 3, 1, 1
     ); 
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         SysFwVersion,
         1, 3, 1, 1
     ); 
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         McpuLabel,
         0, 4, 1, 1
     ); 
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         McpuVersion,
         1, 4, 1, 1
     ); 
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         FwSingleLabel,
         0, 5, 1, 1
     ); 
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         FwSingleVersion,
         1, 5, 1, 1
     );
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         FwMultiLabel,
         0, 6, 1, 1
     ); 
     gtk_grid_attach
     (
-        GridAbout,
+        g_grid_about,
         FwMultiVersion,
         1, 6, 1, 1
     );
 
     /* Append to pages to the notebook container. */
-    gtk_notebook_append_page(notebook, GTK_WIDGET(GridCh[eCh1]), Label1);
-    gtk_notebook_append_page(notebook, GTK_WIDGET(GridCh[eCh2]), Label2);
-    gtk_notebook_append_page(notebook, GTK_WIDGET(GridAbout), Label3);
+    gtk_notebook_append_page(notebook, GTK_WIDGET(g_grid_channel[eCh1]), Label1);
+    gtk_notebook_append_page(notebook, GTK_WIDGET(g_grid_channel[eCh2]), Label2);
+    gtk_notebook_append_page(notebook, GTK_WIDGET(g_grid_about), Label3);
 
 
     /* Add five pixels of spacing between every row and every column. */
-    gtk_grid_set_row_spacing(GridCh[eCh1], 5);
-    gtk_grid_set_row_spacing(GridCh[eCh2], 5);
-    gtk_grid_set_row_spacing(GridAbout, 5);
+    gtk_grid_set_row_spacing(g_grid_channel[eCh1], 5);
+    gtk_grid_set_row_spacing(g_grid_channel[eCh2], 5);
+    gtk_grid_set_row_spacing(g_grid_about, 5);
 
-    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(notebook));
+    gtk_grid_attach(g_grid_master, GTK_WIDGET(notebook), 0, 0, 1, 1);
+    gtk_grid_attach(g_grid_master, GTK_WIDGET(statusbar), 0, 1, 1, 1);
+    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(g_grid_master));
+
     gtk_widget_show_all(window);
     
     gtk_main();

@@ -121,10 +121,13 @@ extern GtkWidget *IdrIntervalEntry[API_VENC_CHN_MAX];
 
 extern GtkWidget *BNumScale[API_VENC_CHN_MAX];
 
-extern GtkWidget *ProgressBar[API_VENC_CHN_MAX];
+extern GtkWidget *progressbar[API_VENC_CHN_MAX];
 
 extern POP_ES_CALLBACK_PARAM_T tPopEsArgs[API_VENC_BOARD_MAX][API_VENC_CHN_MAX];
 extern API_VENC_INIT_PARAM_T tApiInitParam[API_VENC_CHN_MAX];
+
+extern guint context_id;
+extern GtkWidget *statusbar;
 
 #endif
 

@@ -18,6 +18,7 @@
 
 static API_VENC_IMG_T img[API_VENC_CHN_MAX];
 
+
 void handler_profile(GtkWidget *widget, gpointer *data)
 {    
     GSList *list; 
@@ -367,7 +368,7 @@ void ui_process_coded_frame(API_VENC_HEVC_CODED_PICT_T *p_coded_pict, void *args
 
     //LOG("%f %d %d\n", fraction, poped_frame, total_frame);
 
-    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ProgressBar[eCh]), fraction);
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progressbar[eCh]), fraction);
 }
 
 
@@ -923,7 +924,13 @@ static void *encode_thr_fn(void *data)
     fd_w[eCh]  = open(es_file_name, 
                     O_WRONLY | O_CREAT,
                     S_IRWXU);
-                 
+
+    // update status bar
+    char msg[256];
+    sprintf(msg, "Output: %s", es_file_name);
+    context_id = gtk_statusbar_push(GTK_STATUSBAR(statusbar), 
+                     context_id, msg);
+    
     uint8_t *vraw_data_buf_p = NULL;
     uint32_t frame_sz = 0;
     struct stat file_stat;
@@ -979,7 +986,7 @@ static void *encode_thr_fn(void *data)
     timersub(&tv2, &tv1, &res);
     LOG("%lu sec %lu usec\n", res.tv_sec, res.tv_usec); 
     
-    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ProgressBar[eCh]), 0.0);
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progressbar[eCh]), 0.0);
 
     close(fd_w[eCh]);
 
